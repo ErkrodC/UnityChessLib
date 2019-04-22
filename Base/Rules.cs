@@ -70,20 +70,13 @@ namespace UnityChess {
 									return true;
 								}
 
-								switch (piece) {
-									case King _ when surroundingSquares.Contains(piece.Position):
-									case Pawn _ when pawnAttackingSquares.Contains(piece.Position):
-										return true;
+								if (piece is King && surroundingSquares.Contains(piece.Position) || piece is Pawn && pawnAttackingSquares.Contains(piece.Position)) {
+									return true;
 								}
 							}
 							//cardinal directions
-							else {
-								switch (piece) {
-									case Rook _:
-									case Queen _:
-									case King _ when surroundingSquares.Contains(piece.Position):
-										return true;
-								}
+							else if (piece is Rook || piece is Queen || piece is King && surroundingSquares.Contains(piece.Position)) {
+								return true;
 							}
 
 							break;
