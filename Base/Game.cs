@@ -31,7 +31,9 @@ namespace UnityChess {
 		private Board LatestBoard => BoardTimeline.Current;
 		
 		/// <summary>Executes passed move and switches sides; also adds move to history.</summary>
-		public void ExecuteTurn(Movement move) {
+		public bool TryExecuteMove(Movement move) {
+			if (!GetInternalLegalMoveIfPossible(ref move)) return false;
+			
 			//create new copy of previous current board, and execute the move on it
 			Board boardBeforeMove = LatestBoard;
 			Square enPassantEligibleSquare = boardBeforeMove[move.Start] is Pawn pawn && Math.Abs(move.End.Rank - move.Start.Rank) == 2 ?
@@ -53,21 +55,15 @@ namespace UnityChess {
 			bool causedStalemate = Rules.IsPlayerStalemated(resultingBoard, CurrentTurnSide);
 			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, CurrentTurnSide) && !causedCheckmate;
 			PreviousMoves.AddNext(new HalfMove(boardBeforeMove[move.Start], move, capturedPiece, causedCheck, causedStalemate , causedCheckmate));
+
+			return true;
 		}
+		
+		private bool GetInternalLegalMoveIfPossible(ref Movement move) {
+			Piece movingPiece = LatestBoard[move.Start];
+			if (movingPiece == null) return false;
 
-		/// <summary>Checks whether a move is legal on a given board/turn.</summary>
-		/// <param name="baseMove">The base move used to search in the appropriate piece's ValidMovesList.</param>
-		/// <param name="foundLegalMove">The move (potentially a special move) found in the pieces ValidMovesList that corresponds to the passed in baseMove</param>
-		public bool MoveIsLegal(Movement baseMove, out Movement foundLegalMove) {
-			Piece movingPiece = LatestBoard[baseMove.Start];
-			if (movingPiece == null) {
-				foundLegalMove = null;
-				return false;
-			}
-
-			bool actualMoveFound = movingPiece.LegalMoves.FindLegalMoveUsingBaseMove(baseMove, out Movement foundMove);
-			foundLegalMove = foundMove;
-			return movingPiece.Color == CurrentTurnSide && actualMoveFound;
+			return movingPiece.Color == CurrentTurnSide && movingPiece.LegalMoves.TryGetLegalMoveUsingBaseMove(ref move);
 		}
 
 		public void ResetGameToHalfMoveIndex(int halfMoveIndex) {
