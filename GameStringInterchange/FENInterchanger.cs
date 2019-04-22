@@ -60,16 +60,15 @@ namespace UnityChess {
 
 		private static string GetFENPieceSymbol(Piece piece) {
 			bool useCaps = piece.Color == Side.White;
-			switch (piece) {
-				case Bishop _: return useCaps ? "B" : "b";
-				case King _: return useCaps ? "K" : "k";
-				case Knight _: return useCaps ? "N" : "n";
-				case Pawn _: return useCaps ? "P" : "p";
-				case Queen _: return useCaps ? "Q" : "q";
-				case Rook _: return useCaps ? "R" : "r";
-				default: throw new NullReferenceException();
-			}
-		}
+			
+			if (piece is Bishop) return useCaps ? "B" : "b";
+			if (piece is King) return useCaps ? "K" : "k";
+			if (piece is Knight) return useCaps ? "N" : "n";
+			if (piece is Pawn) return useCaps ? "P" : "p";
+			if (piece is Queen) return useCaps ? "Q" : "q";
+			if (piece is Rook) return useCaps ? "R" : "r";
 
+			throw new ArgumentException();
+		}
 	}
 }

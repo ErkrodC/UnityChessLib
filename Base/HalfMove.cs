@@ -38,22 +38,15 @@ namespace UnityChess {
 			string endSquareString = SquareUtil.SquareToString(Move.End);
 			string suffix = CausedCheckmate ? "#" :
 			                CausedCheck     ? "+" : "";
-			
-			switch (Piece) {
-				case King _:
-					if (Move is CastlingMove) moveText += Move.End.File == 3 ? $"O-O-O{suffix}" : $"O-O{suffix}";
-					else moveText += $"{pieceSymbol}{captureText}{endSquareString}{suffix}";
-					break;
-				case Pawn _:
-					string pawnPromotionPieceSymbol = Move is PromotionMove promotionMove ? pieceTypeToANSymbolMap[promotionMove.AssociatedPiece.GetType()] : "";
-					moveText += $"{pieceSymbol}{captureText}{endSquareString}{pawnPromotionPieceSymbol}{suffix}";
-					break;
-				case Knight _:
-				case Bishop _:
-				case Rook _:
-				case Queen _:
-					moveText += $"{pieceSymbol}{captureText}{endSquareString}{suffix}";
-					break;
+
+			if (Piece is King) {
+				if (Move is CastlingMove) moveText += Move.End.File == 3 ? $"O-O-O{suffix}" : $"O-O{suffix}";
+				else moveText += $"{pieceSymbol}{captureText}{endSquareString}{suffix}";
+			} else if (Piece is Pawn) {
+				string pawnPromotionPieceSymbol = Move is PromotionMove promotionMove ? pieceTypeToANSymbolMap[promotionMove.AssociatedPiece.GetType()] : "";
+				moveText += $"{pieceSymbol}{captureText}{endSquareString}{pawnPromotionPieceSymbol}{suffix}";
+			} else if (Piece is Knight || Piece is Bishop || Piece is Rook || Piece is Queen ) {
+				moveText += $"{pieceSymbol}{captureText}{endSquareString}{suffix}";
 			}
 
 			return moveText;
