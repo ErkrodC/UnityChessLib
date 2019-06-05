@@ -5,11 +5,11 @@ namespace UnityChess {
 	public class Game {
 		public Mode Mode { get; }
 		public Side CurrentTurnSide { get; private set; }
-		public int HalfMoveCount => PreviousMoves.HeadIndex;
+		public int LatestHalfMoveIndex => HalfMoveTimeline.HeadIndex;
 		public GameConditions StartingConditions { get; }
 		public Timeline<Board> BoardTimeline { get; }
-		public Timeline<HalfMove> PreviousMoves { get; }
-
+		public Timeline<HalfMove> HalfMoveTimeline { get; }
+		
 		private readonly Timeline<Square> enPassantCaptureSquareTimeline;
 
 		/// <summary>Creates a Game instance of a given mode with a standard starting Board.</summary>
@@ -20,7 +20,7 @@ namespace UnityChess {
 			CurrentTurnSide = Side.White;
 			StartingConditions = startingConditions;
 			BoardTimeline = new Timeline<Board>();
-			PreviousMoves = new Timeline<HalfMove>();
+			HalfMoveTimeline = new Timeline<HalfMove>();
 			enPassantCaptureSquareTimeline = new Timeline<Square>();
 			
 			BoardTimeline.AddNext(new Board());
@@ -54,7 +54,8 @@ namespace UnityChess {
 			bool causedCheckmate = Rules.IsPlayerCheckmated(resultingBoard, CurrentTurnSide);
 			bool causedStalemate = Rules.IsPlayerStalemated(resultingBoard, CurrentTurnSide);
 			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, CurrentTurnSide) && !causedCheckmate;
-			PreviousMoves.AddNext(new HalfMove(boardBeforeMove[move.Start], move, capturedPiece, causedCheck, causedStalemate , causedCheckmate));
+
+			HalfMoveTimeline.AddNext(new HalfMove(boardBeforeMove[move.Start], move, capturedPiece, causedCheck, causedStalemate , causedCheckmate));
 
 			return true;
 		}
@@ -66,13 +67,16 @@ namespace UnityChess {
 			return movingPiece.Color == CurrentTurnSide && movingPiece.LegalMoves.TryGetLegalMoveUsingBaseMove(ref move);
 		}
 
-		public void ResetGameToHalfMoveIndex(int halfMoveIndex) {
+		public bool ResetGameToHalfMoveIndex(int halfMoveIndex) {
+			if (LatestHalfMoveIndex == -1) return false; // i.e. No possible move to reset to
+
 			BoardTimeline.HeadIndex = halfMoveIndex + 1;
 			enPassantCaptureSquareTimeline.HeadIndex = halfMoveIndex + 1;
-			PreviousMoves.HeadIndex = halfMoveIndex;
+			HalfMoveTimeline.HeadIndex = halfMoveIndex;
 			CurrentTurnSide = halfMoveIndex % 2 == 0 ? Side.Black : Side.White;
 			
 			UpdateAllPiecesLegalMoves(BoardTimeline.Current, enPassantCaptureSquareTimeline.Current, CurrentTurnSide);
+			return true;
 		}
 
 		private static void UpdateAllPiecesLegalMoves(Board board, Square enPassantEligibleSquare, Side turn) {

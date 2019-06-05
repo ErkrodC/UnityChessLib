@@ -4,7 +4,7 @@ namespace UnityChess {
 	public class FENInterchanger : IGameStringInterchanger {
 		public string Export(Game game) {
 			Board currentBoard = game.BoardTimeline.Current;
-			GameConditions currentGameConditions = game.StartingConditions.CalculateEndingGameConditions(currentBoard, game.PreviousMoves.GetStartToCurrent());
+			GameConditions currentGameConditions = game.StartingConditions.CalculateEndingGameConditions(currentBoard, game.HalfMoveTimeline.GetStartToCurrent());
 
 			return ConvertCurrentGameStateToFEN(currentBoard, currentGameConditions);
 		}
@@ -17,19 +17,14 @@ namespace UnityChess {
 		private static string ConvertCurrentGameStateToFEN(Board currentBoard, GameConditions currentGameConditions) {
 			string toMoveString = currentGameConditions.WhiteToMove ? "w" : "b";
 
-			bool areAnyCastlingsAvailable = currentGameConditions.WhiteCanCastleKingside || currentGameConditions.WhiteCanCastleQueenside || currentGameConditions.BlackCanCastleKingside || currentGameConditions.BlackCanCastleQueenside;
-			string castlingInfoString = areAnyCastlingsAvailable ?
-				$"{(currentGameConditions.WhiteCanCastleKingside ? "K" : "")}{(currentGameConditions.WhiteCanCastleQueenside ? "Q" : "")}{(currentGameConditions.BlackCanCastleKingside ? "k" : "")}{(currentGameConditions.BlackCanCastleQueenside ? "q" : "")}" :
-				"-";
-
 			string enPassantSquareString = currentGameConditions.EnPassantSquare.IsValid ?
 				SquareUtil.SquareToString(currentGameConditions.EnPassantSquare) :
 				"-";
 
-			return $"{CalculateRankStrings(currentBoard)} {toMoveString} {castlingInfoString} {enPassantSquareString} {currentGameConditions.HalfMoveClock} {currentGameConditions.TurnNumber}";
+			return $"{CalculateBoardString(currentBoard)} {toMoveString} {CalculateCastlingInfoString(currentGameConditions)} {enPassantSquareString} {currentGameConditions.HalfMoveClock} {currentGameConditions.TurnNumber}";
 		}
 
-		private static string CalculateRankStrings(Board currentBoard) {
+		private static string CalculateBoardString(Board currentBoard) {
 			string[] rankStrings = new string[8];
 			for (int rank = 1; rank <= 8; rank++) {
 				int emptySquareCount = 0;
@@ -69,6 +64,25 @@ namespace UnityChess {
 			if (piece is Rook) return useCaps ? "R" : "r";
 
 			throw new ArgumentException();
+		}
+
+		private static string CalculateCastlingInfoString(GameConditions currentGameConditions) {
+			bool anyCastlingAvailable = currentGameConditions.WhiteCanCastleKingside || currentGameConditions.WhiteCanCastleQueenside || currentGameConditions.BlackCanCastleKingside || currentGameConditions.BlackCanCastleQueenside;
+			string castlingInfoString = "";
+
+			if (anyCastlingAvailable) {
+				(bool WhiteCanCastleKingside, string)[] castleFlagSymbolPairs = {
+					(currentGameConditions.WhiteCanCastleKingside, "K"),
+					(currentGameConditions.WhiteCanCastleQueenside, "Q"),
+					(currentGameConditions.BlackCanCastleKingside, "k"),
+					(currentGameConditions.BlackCanCastleQueenside, "q")
+				};
+
+				foreach ((bool canCastle, string fenCastleSymbol) in castleFlagSymbolPairs)
+					if (canCastle) castlingInfoString += fenCastleSymbol;
+			} else castlingInfoString = "-";
+
+			return castlingInfoString;
 		}
 	}
 }
