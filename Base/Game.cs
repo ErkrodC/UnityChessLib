@@ -32,7 +32,7 @@ namespace UnityChess {
 		
 		/// <summary>Executes passed move and switches sides; also adds move to history.</summary>
 		public bool TryExecuteMove(Movement move) {
-			if (!GetInternalLegalMoveIfPossible(ref move)) return false;
+			if (move == null || !GetInternalLegalMoveIfPossible(ref move)) return false;
 			
 			//create new copy of previous current board, and execute the move on it
 			Board boardBeforeMove = LatestBoard;
