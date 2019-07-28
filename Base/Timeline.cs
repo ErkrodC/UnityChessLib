@@ -11,7 +11,6 @@ namespace UnityChess {
 			set => headIndexBacking = Math.Min(value, list.Count - 1);
 		} private int headIndexBacking;
 		
-		
 		private readonly List<T> list;
 		private int FutureElementsStartIndex => headIndexBacking + 1;
 		private int NumFutureElements => list.Count - FutureElementsStartIndex;

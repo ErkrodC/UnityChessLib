@@ -19,9 +19,6 @@
 		}
 		
 		protected bool Equals(Movement other) => Start == other.Start && End == other.End;
-		
-		public static bool operator ==(Movement lhs, Movement rhs) => rhs != null && lhs != null && lhs.Start == rhs.Start && lhs.End == rhs.End;
-		public static bool operator !=(Movement lhs, Movement rhs) => !(lhs == rhs);
 
 		public override bool Equals(object obj) {
 			if (ReferenceEquals(null, obj)) return false;
