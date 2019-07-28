@@ -32,17 +32,17 @@ namespace UnityChess {
 		
 		/// <summary>Executes passed move and switches sides; also adds move to history.</summary>
 		public bool TryExecuteMove(Movement move) {
-			if (!GetInternalLegalMoveIfPossible(ref move)) return false;
+			if (!TryGetLegalMove(move.Start, move.End, out Movement validatedMove)) return false;
 			
 			//create new copy of previous current board, and execute the move on it
 			Board boardBeforeMove = LatestBoard;
-			Square enPassantEligibleSquare = boardBeforeMove[move.Start] is Pawn pawn && Math.Abs(move.End.Rank - move.Start.Rank) == 2 ?
-				                          new Square(move.End, 0, pawn.Color == Side.White ? -1 : 1) :
+			Square enPassantEligibleSquare = boardBeforeMove[validatedMove.Start] is Pawn pawn && Math.Abs(validatedMove.End.Rank - validatedMove.Start.Rank) == 2 ?
+				                          new Square(validatedMove.End, 0, pawn.Color == Side.White ? -1 : 1) :
 				                          Square.Invalid;
 			enPassantCaptureSquareTimeline.AddNext(enPassantEligibleSquare);
 
 			Board resultingBoard = new Board(LatestBoard);
-			resultingBoard.MovePiece(move);
+			resultingBoard.MovePiece(validatedMove);
 
 			BoardTimeline.AddNext(resultingBoard);
 
@@ -50,21 +50,26 @@ namespace UnityChess {
 			
 			UpdateAllPiecesLegalMoves(resultingBoard, enPassantCaptureSquareTimeline.Current, CurrentTurnSide);
 
-			bool capturedPiece = boardBeforeMove[move.End] != null || move is EnPassantMove;
+			bool capturedPiece = boardBeforeMove[validatedMove.End] != null || validatedMove is EnPassantMove;
 			bool causedCheckmate = Rules.IsPlayerCheckmated(resultingBoard, CurrentTurnSide);
 			bool causedStalemate = Rules.IsPlayerStalemated(resultingBoard, CurrentTurnSide);
 			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, CurrentTurnSide) && !causedCheckmate;
 
-			HalfMoveTimeline.AddNext(new HalfMove(boardBeforeMove[move.Start], move, capturedPiece, causedCheck, causedStalemate , causedCheckmate));
+			HalfMoveTimeline.AddNext(new HalfMove(boardBeforeMove[validatedMove.Start], validatedMove, capturedPiece, causedCheck, causedStalemate , causedCheckmate));
 
 			return true;
 		}
 		
-		private bool GetInternalLegalMoveIfPossible(ref Movement move) {
-			Piece movingPiece = LatestBoard[move.Start];
-			if (movingPiece == null) return false;
+		public bool TryGetLegalMove(Square startSquare, Square endSquare, out Movement move) {
+			Piece movingPiece = LatestBoard[startSquare];
 
-			return movingPiece.Color == CurrentTurnSide && movingPiece.LegalMoves.TryGetLegalMoveUsingBaseMove(ref move);
+			if (movingPiece == null) {
+				move = null;
+				return false;
+			}
+
+			bool foundMove = movingPiece.LegalMoves.TryGetLegalMove(startSquare, endSquare, out move);
+			return movingPiece.Color == CurrentTurnSide && foundMove;
 		}
 
 		public bool ResetGameToHalfMoveIndex(int halfMoveIndex) {
