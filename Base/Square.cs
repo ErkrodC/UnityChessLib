@@ -1,5 +1,8 @@
-﻿namespace UnityChess {
+﻿using System;
+
+namespace UnityChess {
 	/// <summary>Representation of a square on a chessboard.</summary>
+	[Serializable]
 	public struct Square {
 		public static readonly Square Invalid = new Square(-1, -1);
 		public readonly int File;

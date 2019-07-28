@@ -1,5 +1,8 @@
-﻿namespace UnityChess {
+﻿using System;
+
+namespace UnityChess {
 	/// <summary>Representation of a move, namely a piece and its end square.</summary>
+	[Serializable]
 	public class Movement {
 		public readonly Square Start;
 		public readonly Square End;
