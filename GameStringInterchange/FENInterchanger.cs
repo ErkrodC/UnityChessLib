@@ -59,7 +59,7 @@ namespace UnityChess {
 		private static string GetFENPieceSymbol(Piece piece) {
 			bool isWhitePiece = piece.Color == Side.White;
 
-			if (piece is Bishop)	{ return isWhitePiece ? "B" : "b"; } // NOTE switch not supported in Mono 6.0.0.0
+			if (piece is Bishop)	{ return isWhitePiece ? "B" : "b"; } // NOTE discards not supported in Mono 6.0.0.0
 			if (piece is King)		{ return isWhitePiece ? "K" : "k"; }
 			if (piece is Knight)	{ return isWhitePiece ? "N" : "n"; }
 			if (piece is Pawn)		{ return isWhitePiece ? "P" : "p"; }
