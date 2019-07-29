@@ -4,14 +4,10 @@ using System.Runtime.InteropServices;
 namespace UnityChess.Networking {
 	[Serializable, StructLayout(LayoutKind.Sequential, Pack = 1)]
 	public struct UnityChessDataPacket {
-		public UnityChessDataPacketHeader Header;
 		public UserCommand UserCommand;
-		public byte[] UserData;
-
-		public UnityChessDataPacket(UserCommand userCommand, byte[] userData) {
-			Header = new UnityChessDataPacketHeader(userData.Length);
-			UserCommand = userCommand;
-			UserData = userData;
-		}
+		public byte byte0;
+		public byte byte1;
+		public byte byte2;
+		public byte byte3;
 	}
 }
