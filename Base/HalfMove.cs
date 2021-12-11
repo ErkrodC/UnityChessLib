@@ -30,23 +30,33 @@ namespace UnityChess {
 		
 		// TODO handle ambiguous piece moves.
 		public string ToAlgebraicNotation() {
-			string moveText = "";
-			string pieceSymbol = Piece is Pawn ?
-				                     CapturedPiece ? SquareUtil.FileIntToCharMap[Move.Start.File] : "" :
-				                     pieceTypeToANSymbolMap[Piece.GetType()];
-			string captureText = CapturedPiece ? "x" : "";
-			string endSquareString = SquareUtil.SquareToString(Move.End);
-			string suffix = CausedCheckmate ? "#" :
-			                CausedCheck     ? "+" : "";
+			string pieceSymbol = Piece is Pawn && CapturedPiece
+				? SquareUtil.FileIntToCharMap[Move.Start.File]
+				: pieceTypeToANSymbolMap[Piece.GetType()];
 
-			if (Piece is King) {
-				if (Move is CastlingMove) moveText += Move.End.File == 3 ? $"O-O-O{suffix}" : $"O-O{suffix}";
-				else moveText += $"{pieceSymbol}{captureText}{endSquareString}{suffix}";
-			} else if (Piece is Pawn) {
-				string pawnPromotionPieceSymbol = Move is PromotionMove promotionMove ? pieceTypeToANSymbolMap[promotionMove.AssociatedPiece.GetType()] : "";
-				moveText += $"{pieceSymbol}{captureText}{endSquareString}{pawnPromotionPieceSymbol}{suffix}";
-			} else if (Piece is Knight || Piece is Bishop || Piece is Rook || Piece is Queen ) {
-				moveText += $"{pieceSymbol}{captureText}{endSquareString}{suffix}";
+			string capture = CapturedPiece ? "x" : string.Empty;
+			string endSquare = SquareUtil.SquareToString(Move.End);
+			string suffix = CausedCheckmate ? "#" :
+			                CausedCheck     ? "+" : string.Empty;
+
+			string moveText;
+			switch (Piece) {
+				case King when Move is CastlingMove: {
+					moveText = Move.End.File == 3 ? $"O-O-O{suffix}" : $"O-O{suffix}";
+					break;
+				}
+				case Pawn: {
+					string promotionPiece = Move is PromotionMove promotionMove
+						? $"={pieceTypeToANSymbolMap[promotionMove.AssociatedPiece.GetType()]}"
+						: string.Empty;
+
+					moveText = $"{pieceSymbol}{capture}{endSquare}{promotionPiece}{suffix}";
+					break;
+				}
+				default: {
+					moveText = $"{pieceSymbol}{capture}{endSquare}{suffix}";
+					break;
+				}
 			}
 
 			return moveText;
