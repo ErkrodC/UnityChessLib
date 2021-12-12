@@ -84,7 +84,7 @@ namespace UnityChess {
 			return true;
 		}
 
-		private static void UpdateAllPiecesLegalMoves(Board board, Square enPassantEligibleSquare, Side turn) {
+		internal static void UpdateAllPiecesLegalMoves(Board board, Square enPassantEligibleSquare, Side turn) {
 			for (int file = 1; file <= 8; file++)
 				for (int rank = 1; rank <= 8; rank++) {
 					Piece piece = board[file, rank];

@@ -1,8 +1,8 @@
 ﻿using System;
 
 namespace UnityChess {
-	public class FENInterchanger : IGameStringInterchanger {
-		public string Export(Game game) {
+	public class FENSerializer : IGameSerializer {
+		public string Serialize(Game game) {
 			Board currentBoard = game.BoardTimeline.Current;
 			GameConditions currentGameConditions = game.StartingConditions.CalculateEndingGameConditions(currentBoard, game.HalfMoveTimeline.GetStartToCurrent());
 
@@ -10,7 +10,7 @@ namespace UnityChess {
 		}
 		
 		// TODO implement
-		public Game Import(string fen) {
+		public Game Deserialize(string fen) {
 			throw new NotImplementedException();
 		}
 

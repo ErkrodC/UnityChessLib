@@ -10,5 +10,9 @@
 		/// <summary>Handles replacing the promoting pawn with the elected promotion piece.</summary>
 		/// <param name="board">Board on which the move is being made.</param>
 		public override void HandleAssociatedPiece(Board board) => board[End] = AssociatedPiece;
+
+		public void SetPromotionPiece(Piece promotionPiece) {
+			
+		}
 	}
 }
