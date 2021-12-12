@@ -18,15 +18,12 @@ namespace UnityChess.Test {
 		[TestCase(ElectedPiece.Queen)]
 		public void HandleAssociatedPiece_PromotionMove_ElectedPieceGenerated(ElectedPiece election) {
 			Square expectedPosition = new Square(1, 8);
-			MockPromotionMove mpm = new MockPromotionMove(expectedPosition, election);
+			PromotionMove mpm = new PromotionMove(Square.Invalid, expectedPosition);
+			mpm.SetPromotionPiece(PromotionUtil.GeneratePromotionPiece(election, expectedPosition, Side.White));
 
 			mpm.HandleAssociatedPiece(board);
 
-			Assert.AreEqual($"UnityChess.{election.ToString()}", board[expectedPosition].GetType().ToString());
+			Assert.AreEqual(election.ToString(), board[expectedPosition]?.GetType().Name);
 		}
-	}
-
-	public class MockPromotionMove : PromotionMove {
-		public MockPromotionMove(Square end, ElectedPiece election) : base(new Square(1, 7), end) { }
 	}
 }

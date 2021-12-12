@@ -17,17 +17,12 @@ namespace UnityChess.Test {
 			Square startingSquare = new Square(rookStartingFile, 1);
 			Rook rook = new Rook(startingSquare, Side.White);
 			board[startingSquare] = rook;
-			MockCastlingMove mcm = new MockCastlingMove(rook);
+			CastlingMove mcm = new CastlingMove(new Square(5, 1), new Square(7, 1), rook);
 
 			mcm.HandleAssociatedPiece(board);
 
 			Assert.True(rook.HasMoved);
 			Assert.AreEqual(expected, rook.Position.File);
-		}
-	}
-
-	public class MockCastlingMove : CastlingMove {
-		public MockCastlingMove(Rook rook) : base(new Square(5, 1), new Square(7, 1), rook) {
 		}
 	}
 }

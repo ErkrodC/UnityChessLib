@@ -24,10 +24,15 @@ namespace UnityChess {
 			{8, "h"}
 		};
 	
-		public static string FileRankToSquareString(int file, int rank) => $"{FileIntToCharMap[file]}{rank}";
+		public static string SquareToString(Square square) => SquareToString(square.File, square.Rank);
+		public static string SquareToString(int file, int rank) {
+			if (FileIntToCharMap.TryGetValue(file, out string fileChar)) {
+				return $"{fileChar}{rank}";
+			}
 
-		public static string SquareToString(Square square) => FileRankToSquareString(square.File, square.Rank);
-	
+			return "Invalid";
+		}
+
 		public static Square StringToSquare(string squareText) {
 			int file = FileCharToIntMap[squareText.Substring(0, 1)];
 			int rank = int.Parse(squareText.Substring(1, 1));

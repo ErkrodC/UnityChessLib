@@ -125,5 +125,25 @@ namespace UnityChess {
 				}
 			}
 		}
+
+		public string ToASCIIArt() {
+			string result = string.Empty;
+			
+			for (int rank = 8; rank >= 1; --rank) {
+				for (int file = 1; file <= 8; ++file) {
+					Piece piece = this[file, rank];
+					result += piece == null ? " " : FENSerializer.GetFENPieceSymbol(piece);
+					result += file != 8
+						? "|"
+						: $"\t {rank}";
+				}
+
+				result += "\n";
+			}
+			
+			result += "a b c d e f g h";
+
+			return result;
+		}
 	}
 }

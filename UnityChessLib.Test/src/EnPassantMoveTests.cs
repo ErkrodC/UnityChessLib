@@ -13,18 +13,16 @@ namespace UnityChess.Test {
 
 		[Test]
 		public void HandleAssociatedPiece_EnPassantMove_AssocPawnIsRemoved() {
-			Square pawnPosition = new Square(1, 2);
-			Pawn pawn = new Pawn(pawnPosition, Side.White);
-			board[pawnPosition] = pawn;
-			MockEnPassantMove mepm = new MockEnPassantMove(pawn);
+			Square capturedPawnStartSquare = new Square(1, 2);
+			Pawn capturedPawn = new Pawn(capturedPawnStartSquare, Side.White);
+			board[capturedPawnStartSquare] = capturedPawn;
+			
+			
+			EnPassantMove mepm = new EnPassantMove(Square.Invalid, Square.Invalid, capturedPawn);
 
 			mepm.HandleAssociatedPiece(board);
 
-			Assert.AreNotEqual(board[pawn.Position], pawn);
+			Assert.AreNotEqual(board[capturedPawn.Position], capturedPawn);
 		}
-	}
-
-	public class MockEnPassantMove : EnPassantMove {
-		public MockEnPassantMove(Pawn pawn) : base(new Square(5, 1), new Square(7, 1), pawn) { }
 	}
 }

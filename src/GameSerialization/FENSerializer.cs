@@ -53,17 +53,25 @@ namespace UnityChess {
 			return string.Join("/", rankStrings);
 		}
 
-		private static string GetFENPieceSymbol(Piece piece) {
-			bool useCaps = piece.Color == Side.White;
-			
-			if (piece is Bishop) return useCaps ? "B" : "b";
-			if (piece is King) return useCaps ? "K" : "k";
-			if (piece is Knight) return useCaps ? "N" : "n";
-			if (piece is Pawn) return useCaps ? "P" : "p";
-			if (piece is Queen) return useCaps ? "Q" : "q";
-			if (piece is Rook) return useCaps ? "R" : "r";
+		public static string GetFENPieceSymbol(Piece piece) {
+			bool isWhite = piece?.Color == Side.White;
 
-			throw new ArgumentException();
+			switch (piece) {
+				case Bishop:
+					return isWhite ? "B" : "b";
+				case King:
+					return isWhite ? "K" : "k";
+				case Knight:
+					return isWhite ? "N" : "n";
+				case Pawn:
+					return isWhite ? "P" : "p";
+				case Queen:
+					return isWhite ? "Q" : "q";
+				case Rook:
+					return isWhite ? "R" : "r";
+				default:
+					return string.Empty;
+			}
 		}
 
 		private static string CalculateCastlingInfoString(GameConditions currentGameConditions) {

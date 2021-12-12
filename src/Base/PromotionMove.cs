@@ -12,7 +12,7 @@
 		public override void HandleAssociatedPiece(Board board) => board[End] = AssociatedPiece;
 
 		public void SetPromotionPiece(Piece promotionPiece) {
-			
+			AssociatedPiece = promotionPiece;
 		}
 	}
 }

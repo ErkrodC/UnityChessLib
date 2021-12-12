@@ -16,9 +16,9 @@ namespace UnityChess.Test {
 		}
 
 		[Test]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.CheckCases))]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.CheckmateCases))]
-		public void IsPlayerInCheck_CheckPositions_ReturnsTrue(PositionInitializer arrange, Side side) {
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckCases))]
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckmateCases))]
+		public void IsPlayerInCheck_PositionsWithCheck_ReturnsTrue(PositionInitializer arrange, Side side) {
 			arrange(board, side);
 
 			bool actual = Rules.IsPlayerInCheck(board, side);
@@ -29,8 +29,8 @@ namespace UnityChess.Test {
 
 		[Test]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.NoneCases))]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.StalemateCases))]
-		public void IsPlayerInCheck_NoncheckPositions_ReturnsFalse(PositionInitializer arrange, Side side) {
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithStalemateCases))]
+		public void IsPlayerInCheck_PositionsWithoutCheck_ReturnsFalse(PositionInitializer arrange, Side side) {
 			arrange(board, side);
 
 			bool actual = Rules.IsPlayerInCheck(board, side);
@@ -40,7 +40,7 @@ namespace UnityChess.Test {
 		}
 
 		[Test]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.StalemateCases))]
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithStalemateCases))]
 		public void IsPlayerStalemated_StalematedPosition_ReturnsTrue(PositionInitializer arrange, Side side) {
 			arrange(board, side);
 
@@ -52,9 +52,9 @@ namespace UnityChess.Test {
 
 		[Test]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.NoneCases))]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.CheckCases))]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.CheckmateCases))]
-		public void IsPlayerStalemated_NonstalematedPosition_ReturnsFalse(PositionInitializer arrange, Side side) {
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckCases))]
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckmateCases))]
+		public void IsPlayerStalemated_NonStalematedPosition_ReturnsFalse(PositionInitializer arrange, Side side) {
 			arrange(board, side);
 
 			bool actual = Rules.IsPlayerStalemated(board, side);
@@ -64,7 +64,7 @@ namespace UnityChess.Test {
 		}
 
 		[Test]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.CheckmateCases))]
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckmateCases))]
 		public void IsPlayerCheckmated_CheckmatedPosition_ReturnsTrue(PositionInitializer arrange, Side side) {
 			arrange(board, side);
 
@@ -76,8 +76,8 @@ namespace UnityChess.Test {
 
 		[Test]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.NoneCases))]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.CheckCases))]
-		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.StalemateCases))]
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckCases))]
+		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithStalemateCases))]
 		public void IsPlayerCheckmated_NoncheckmatedPosition_ReturnsFalse(PositionInitializer arrange, Side side) {
 			arrange(board, side);
 
@@ -211,7 +211,7 @@ namespace UnityChess.Test {
 						break;
 				}
 
-				PositionInitializer initializer = (board, side) => {
+				return (board, side) => {
 					King checkedKing = new King(new Square(4, 4), side);
 					King checkingKing = new King(new Square(8, 1), side.Complement());
 					Queen checkingQueen = new Queen(queenSquare, side.Complement());
@@ -221,8 +221,6 @@ namespace UnityChess.Test {
 					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
 				};
-
-				return initializer;
 			}
 
 			private static PositionInitializer RookCheck(Direction direction) {
@@ -246,7 +244,7 @@ namespace UnityChess.Test {
 						break;
 				}
 
-				PositionInitializer initializer = (board, side) => {
+				return (board, side) => {
 					King checkedKing = new King(new Square(4, 4), side);
 					King checkingKing = new King(new Square(8, 1), side.Complement());
 					Rook checkingRook = new Rook(rookSquare, side.Complement());
@@ -256,8 +254,6 @@ namespace UnityChess.Test {
 					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
 				};
-
-				return initializer;
 			}
 
 			private static PositionInitializer BishopCheck(Direction direction) {
@@ -281,7 +277,7 @@ namespace UnityChess.Test {
 						break;
 				}
 
-				PositionInitializer initializer = (board, side) => {
+				return (board, side) => {
 					King checkedKing = new King(new Square(4, 4), side);
 					King checkingKing = new King(new Square(8, 1), side.Complement());
 					Bishop checkingBishop = new Bishop(bishopSquare, side.Complement());
@@ -291,8 +287,6 @@ namespace UnityChess.Test {
 					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
 				};
-
-				return initializer;
 			}
 
 			private static PositionInitializer KnightCheck(KnightDirection direction) {
@@ -328,7 +322,7 @@ namespace UnityChess.Test {
 						break;
 				}
 
-				PositionInitializer initializer = (board, side) => {
+				return (board, side) => {
 					King checkedKing = new King(new Square(4, 4), side);
 					King checkingKing = new King(new Square(8, 1), side.Complement());
 					Knight checkingKnight = new Knight(knightSquare, side.Complement());
@@ -338,8 +332,6 @@ namespace UnityChess.Test {
 					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
 				};
-
-				return initializer;
 			}
 
 			private static PositionInitializer PawnCheck(Direction direction, Side checkedSide) {
@@ -371,7 +363,7 @@ namespace UnityChess.Test {
 					}
 				}
 
-				PositionInitializer initializer = (board, side) => {
+				return (board, side) => {
 					King checkedKing = new King(new Square(4, 4), side);
 					King checkingKing = new King(new Square(8, 1), side.Complement());
 					Pawn checkingPawn = new Pawn(pawnSquare, side.Complement());
@@ -381,8 +373,6 @@ namespace UnityChess.Test {
 					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
 				};
-
-				return initializer;
 			}
 
 			private static void KingPawnStalemate(Board board, Side side) {
@@ -472,6 +462,11 @@ namespace UnityChess.Test {
 					blunderPawn2 = new Pawn(new Square(7, 2), side.Complement());
 				}
 
+				stalematedKing.HasMoved = true;
+				stalematedPawn.HasMoved = true;
+				blunderKing.HasMoved = true;
+				blunderPawn1.HasMoved = true;
+
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderPawn1, blunderPawn2);
 
 				board.InitKings();
@@ -498,6 +493,12 @@ namespace UnityChess.Test {
 					blunderBishop = new Bishop(new Square(7, 7), side.Complement());
 					blunderPawn = new Pawn(new Square(1, 3), side.Complement());
 				}
+				
+				stalematedKing.HasMoved = true;
+				stalematedPawn.HasMoved = true;
+				blunderKing.HasMoved = true;
+				blunderBishop.HasMoved = true;
+				blunderPawn.HasMoved = true;
 				
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderBishop, blunderPawn);
 
@@ -568,6 +569,20 @@ namespace UnityChess.Test {
 					blunderPawns[4] = new Pawn(new Square(7, 4), side.Complement());
 					blunderPawns[5] = new Pawn(new Square(8, 5), side.Complement());
 				}
+				
+				stalematedKing.HasMoved = true; 
+				stalematedPawns[0].HasMoved = true;
+				stalematedPawns[1].HasMoved = true;
+				stalematedPawns[3].HasMoved = true;
+				blunderKing.HasMoved = true; 
+				blunderRook.HasMoved = true;
+				blunderQueen.HasMoved = true; 
+				blunderPawns[0].HasMoved = true;
+				blunderPawns[1].HasMoved = true;
+				blunderPawns[2].HasMoved = true;
+				blunderPawns[3].HasMoved = true;
+				blunderPawns[4].HasMoved = true;
+				blunderPawns[5].HasMoved = true;
 				
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook, blunderQueen);
 
@@ -782,7 +797,7 @@ namespace UnityChess.Test {
 				new object[] {new PositionInitializer(NeutralPawnsNone), Side.Black},
 			};
 
-			public static object[] CheckCases = {
+			public static object[] WithCheckCases = {
 				new TestCaseData(new object[] {QueenCheck(Direction.Kingside), Side.White}).SetName("{m}(QueenCheck(Kingside), {1})"),
 				new TestCaseData(new object[] {QueenCheck(Direction.Kingside), Side.Black}).SetName("{m}(QueenCheck(Kingside), {1})"),
 				new TestCaseData(new object[] {QueenCheck(Direction.BlackKingside), Side.White}).SetName("{m}(QueenCheck(BlackKingside), {1})"),
@@ -841,7 +856,7 @@ namespace UnityChess.Test {
 				new TestCaseData(new object[] {PawnCheck(Direction.Queenside, Side.Black), Side.Black}).SetName("{m}(PawnCheck(Queenside), {1})"),
 			};
 
-			public static object[] StalemateCases = {
+			public static object[] WithStalemateCases = {
 				new object[] {new PositionInitializer(KingPawnStalemate), Side.White},
 				new object[] {new PositionInitializer(KingPawnStalemate), Side.Black},
 				new object[] {new PositionInitializer(KingRookStalemate), Side.White},
@@ -862,7 +877,7 @@ namespace UnityChess.Test {
 				new object[] {new PositionInitializer(GelfandVsKramnikStalemate), Side.Black},
 			};
 
-			public static object[] CheckmateCases = {
+			public static object[] WithCheckmateCases = {
 				new object[] {new PositionInitializer(DoubleRookCheckmate), Side.White},
 				new object[] {new PositionInitializer(DoubleRookCheckmate), Side.Black},
 				new object[] {new PositionInitializer(KingQueenCheckmate), Side.White},
