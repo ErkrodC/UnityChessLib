@@ -10,28 +10,34 @@
 		}
 
 		private void CheckRoseDirections(Board board) {
-			foreach (int fileOffset in new[] {-1, 0, 1}) {
-				foreach (int rankOffset in new[] {-1, 0, 1}) {
-					if (fileOffset == 0 && rankOffset == 0) continue;
+			Square enemyKingPosition = OwningSide == Side.White
+				? board.BlackKing.Position
+				: board.WhiteKing.Position;
+			
+			foreach (Square offset in SquareUtil.SurroundingOffsets) {
+				Square testSquare = Position + offset;
 
-					Square testSquare = new Square(Position, fileOffset, rankOffset);
+				while (testSquare.IsValid()) {
 					Movement testMove = new Movement(Position, testSquare);
 
-					while (testSquare.IsValid()) {
-						Square enemyKingPosition = OwningSide == Side.White ? board.BlackKing.Position : board.WhiteKing.Position;
-						if (board.IsOccupied(testSquare)) {
-							if (!board.IsOccupiedBySide(testSquare, OwningSide) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)
-								LegalMoves.Add(new Movement(testMove));
-
-							break;
+					if (board.IsOccupiedAt(testSquare)) {
+						if (!board.IsOccupiedBySideAt(testSquare, OwningSide)
+						    && Rules.MoveObeysRules(board, testMove, OwningSide)
+						    && testSquare != enemyKingPosition
+						) {
+							LegalMoves.Add(new Movement(testMove));
 						}
 
-						if (Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)
-							LegalMoves.Add(new Movement(testMove));
-
-						testSquare = new Square(testSquare, fileOffset, rankOffset);
-						testMove = new Movement(Position, testSquare);
+						break;
 					}
+
+					if (Rules.MoveObeysRules(board, testMove, OwningSide)
+					    && testSquare != enemyKingPosition
+					) {
+						LegalMoves.Add(new Movement(testMove));
+					}
+
+					testSquare += offset;
 				}
 			}
 		}

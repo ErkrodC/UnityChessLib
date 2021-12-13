@@ -1,37 +1,42 @@
-﻿using System;
-
-namespace UnityChess {
+﻿namespace UnityChess {
 	public class Rook : Piece {
 		public Rook(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public Rook(Rook rookCopy) : base(rookCopy) {}
 		
 		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
 			LegalMoves.Clear();
-
 			CheckCardinalDirections(board);
 		}
 
 		private void CheckCardinalDirections(Board board) {
-			foreach (int fileOffset in new[] {-1, 0, 1}) {
-				foreach (int rankOffset in Math.Abs(fileOffset) == 1 ? new[] {0} : new[] {-1, 1}) {
-					Square testSquare = new Square(Position, fileOffset, rankOffset);
+			foreach (Square offset in SquareUtil.CardinalOffsets) {
+				Square testSquare = Position + offset;
+
+				while (testSquare.IsValid()) {
 					Movement testMove = new Movement(Position, testSquare);
-
-					while (testSquare.IsValid()) {
-						Square enemyKingPosition = OwningSide == Side.White ? board.BlackKing.Position : board.WhiteKing.Position;
-						if (board.IsOccupied(testSquare)) {
-							if (!board.IsOccupiedBySide(testSquare, OwningSide) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)
-								LegalMoves.Add(new Movement(testMove));
-
-							break;
+					
+					Square enemyKingPosition = OwningSide == Side.White
+						? board.BlackKing.Position
+						: board.WhiteKing.Position;
+					
+					if (board.IsOccupiedAt(testSquare)) {
+						if (!board.IsOccupiedBySideAt(testSquare, OwningSide)
+						    && Rules.MoveObeysRules(board, testMove, OwningSide)
+						    && testSquare != enemyKingPosition
+						) {
+							LegalMoves.Add(new Movement(testMove));
 						}
 
-						if (Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)
-							LegalMoves.Add(new Movement(testMove));
-
-						testSquare = new Square(testSquare, fileOffset, rankOffset);
-						testMove = new Movement(Position, testSquare);
+						break;
 					}
+
+					if (Rules.MoveObeysRules(board, testMove, OwningSide)
+					    && testSquare != enemyKingPosition
+					) {
+						LegalMoves.Add(new Movement(testMove));
+					}
+
+					testSquare += offset;
 				}
 			}
 		}

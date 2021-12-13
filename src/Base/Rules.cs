@@ -3,28 +3,6 @@
 namespace UnityChess {
 	/// <summary>Contains methods for checking legality of moves and board positions.</summary>
 	public static class Rules {
-		private static readonly Square[] knightOffsets = {
-			new Square(-2, -1),
-			new Square(-2, 1),
-			new Square(2, -1),
-			new Square(2, 1),
-			new Square(-1, -2),
-			new Square(-1, 2),
-			new Square(1, -2),
-			new Square(1, 2),
-		};
-		
-		private static readonly Square[] surroundingOffsets = {
-			new Square(-1, 0),
-			new Square(1, 0),
-			new Square(0, -1),
-			new Square(0, 1),
-			new Square(-1, 1),
-			new Square(-1, -1),
-			new Square(1, -1),
-			new Square(1, 1)
-		};
-
 		/// <summary>Checks if the player of the given side has been checkmated.</summary>
 		public static bool IsPlayerCheckmated(Board board, Side player) => PlayerHasNoLegalMoves(player, board) && IsPlayerInCheck(board, player);
 
@@ -70,13 +48,13 @@ namespace UnityChess {
 			Side enemySide = friendlySide.Complement();
 			int friendlyForward = friendlySide.ForwardDirection();
 
-			foreach (Square offset in surroundingOffsets) {
+			foreach (Square offset in SquareUtil.SurroundingOffsets) {
 				bool isDiagonalOffset = Math.Abs(offset.File) == Math.Abs(offset.Rank);
 				Square friendlySquare = friendlyPiece.Position;
 				Square testSquare = friendlySquare + offset;
 
-				while (testSquare.IsValid() && !board.IsOccupiedBySide(testSquare, friendlySide)) {
-					if (board.IsOccupiedBySide(testSquare, enemySide)) {
+				while (testSquare.IsValid() && !board.IsOccupiedBySideAt(testSquare, friendlySide)) {
+					if (board.IsOccupiedBySideAt(testSquare, enemySide)) {
 						int fileDistance = Math.Abs(testSquare.File - friendlySquare.File);
 						int rankDistance = Math.Abs(testSquare.Rank - friendlySquare.Rank);
 
@@ -99,7 +77,7 @@ namespace UnityChess {
 				}
 			}
 			
-			foreach (Square offset in knightOffsets) {
+			foreach (Square offset in SquareUtil.KnightOffsets) {
 				Square testSquare = friendlyPiece.Position + offset;
 				
 				if (testSquare.IsValid()

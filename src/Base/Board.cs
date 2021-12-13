@@ -111,9 +111,9 @@ namespace UnityChess {
 			(move as SpecialMove)?.HandleAssociatedPiece(this);
 		}
 		
-		internal bool IsOccupied(Square position) => this[position] != null;
+		internal bool IsOccupiedAt(Square position) => this[position] != null;
 
-		internal bool IsOccupiedBySide(Square position, Side side) => this[position] is Piece piece && piece.OwningSide == side;
+		internal bool IsOccupiedBySideAt(Square position, Side side) => this[position] is Piece piece && piece.OwningSide == side;
 
 		public void InitKings() {
 			for (int file = 1; file <= 8; file++) {

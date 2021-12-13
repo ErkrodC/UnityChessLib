@@ -8,5 +8,7 @@
 	public static class SideMethods {
 		public static Side Complement(this Side side) => side == Side.White ? Side.Black : Side.White;
 		public static int ForwardDirection(this Side side) => side == Side.White ? 1 : -1;
+		public static int CastlingRank(this Side side) => side == Side.White ? 1 : 8;
+		public static int PawnRank(this Side side) => side == Side.White ? 2 : 7;
 	}
 }
