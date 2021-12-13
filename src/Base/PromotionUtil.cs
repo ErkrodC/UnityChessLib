@@ -15,8 +15,7 @@ namespace UnityChess {
 			Piece piece = ElectedPieceGeneratorMap[election](position, side);
 			
 			if (piece == null) return null;
-			
-			piece.HasMoved = true;
+
 			return piece;
 		}
 	}

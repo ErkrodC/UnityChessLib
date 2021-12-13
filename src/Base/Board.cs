@@ -105,7 +105,6 @@ namespace UnityChess {
 			this[move.Start] = null;
 			this[move.End] = pieceToMove;
 
-			pieceToMove.HasMoved = true;
 			pieceToMove.Position = move.End;
 
 			(move as SpecialMove)?.HandleAssociatedPiece(this);

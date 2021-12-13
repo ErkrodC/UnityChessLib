@@ -6,18 +6,15 @@ namespace UnityChess {
 		public readonly Side OwningSide;
 		public readonly LegalMovesList LegalMoves;
 		public Square Position;
-		public bool HasMoved;
 
 		protected Piece(Square startPosition, Side owningSide) {
 			OwningSide = owningSide;
-			HasMoved = false;
 			Position = startPosition;
 			LegalMoves = new LegalMovesList();
 		}
 
 		protected Piece(Piece pieceCopy) {
 			OwningSide = pieceCopy.OwningSide;
-			HasMoved = pieceCopy.HasMoved;
 			Position = pieceCopy.Position;
 			LegalMoves = pieceCopy.LegalMoves.DeepCopy();
 		}

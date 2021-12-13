@@ -7,7 +7,20 @@
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckSurroundingSquares(board);
-			CheckCastlingMoves(board);
+
+			if (OwningSide == Side.White) {
+				CheckCastlingMoves(
+					board,
+					gameConditions.WhiteCanCastleKingside,
+					gameConditions.WhiteCanCastleQueenside
+				);
+			} else {
+				CheckCastlingMoves(
+					board,
+					gameConditions.BlackCanCastleKingside,
+					gameConditions.BlackCanCastleQueenside
+				);
+			}
 		}
 
 		private void CheckSurroundingSquares(Board board) {
@@ -28,22 +41,24 @@
 			}
 		}
 
-		private void CheckCastlingMoves(Board board) {
-			if (HasMoved || Rules.IsPlayerInCheck(board, OwningSide)) {
-				return;
-			}
+		private void CheckCastlingMoves(Board board, bool canCastleKingSide, bool canCastleQueenside) {
+			if (Rules.IsPlayerInCheck(board, OwningSide)
+				|| !canCastleKingSide && !canCastleQueenside
+			) { return; }
 
 			int castlingRank = OwningSide.CastlingRank();
 			
 			foreach (int rookFile in rookFiles) {
+				bool checkingQueenside = rookFile == 1;
+				
 				if (board[rookFile, castlingRank] is not Rook rook
 				    || rook.OwningSide != OwningSide
-				    || rook.HasMoved
+				    || checkingQueenside && !canCastleQueenside
+				    || !checkingQueenside && !canCastleKingSide
 				) {
 					continue;
 				}
-
-				bool checkingQueenside = rookFile == 1;
+				
 				Square inBetweenSquare0 = new Square(checkingQueenside ? 4 : 6, castlingRank);
 				Square inBetweenSquare1 = new Square(checkingQueenside ? 3 : 7, castlingRank);
 				Square inBetweenSquare2 = new Square(2, castlingRank);

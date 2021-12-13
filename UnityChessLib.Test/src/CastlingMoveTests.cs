@@ -20,8 +20,7 @@ namespace UnityChess.Test {
 			CastlingMove mcm = new CastlingMove(new Square(5, 1), new Square(7, 1), rook);
 
 			mcm.HandleAssociatedPiece(board);
-
-			Assert.True(rook.HasMoved);
+			
 			Assert.AreEqual(expected, rook.Position.File);
 		}
 	}

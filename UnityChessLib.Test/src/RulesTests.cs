@@ -483,11 +483,6 @@ namespace UnityChess.Test {
 					blunderPawn2 = new Pawn(new Square(7, 2), side.Complement());
 				}
 
-				stalematedKing.HasMoved = true;
-				stalematedPawn.HasMoved = true;
-				blunderKing.HasMoved = true;
-				blunderPawn1.HasMoved = true;
-
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderPawn1, blunderPawn2);
 
 				board.InitKings();
@@ -514,13 +509,7 @@ namespace UnityChess.Test {
 					blunderBishop = new Bishop(new Square(7, 7), side.Complement());
 					blunderPawn = new Pawn(new Square(1, 3), side.Complement());
 				}
-				
-				stalematedKing.HasMoved = true;
-				stalematedPawn.HasMoved = true;
-				blunderKing.HasMoved = true;
-				blunderBishop.HasMoved = true;
-				blunderPawn.HasMoved = true;
-				
+
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderBishop, blunderPawn);
 
 				board.InitKings();
@@ -590,21 +579,7 @@ namespace UnityChess.Test {
 					blunderPawns[4] = new Pawn(new Square(7, 4), side.Complement());
 					blunderPawns[5] = new Pawn(new Square(8, 5), side.Complement());
 				}
-				
-				stalematedKing.HasMoved = true; 
-				stalematedPawns[0].HasMoved = true;
-				stalematedPawns[1].HasMoved = true;
-				stalematedPawns[3].HasMoved = true;
-				blunderKing.HasMoved = true; 
-				blunderRook.HasMoved = true;
-				blunderQueen.HasMoved = true; 
-				blunderPawns[0].HasMoved = true;
-				blunderPawns[1].HasMoved = true;
-				blunderPawns[2].HasMoved = true;
-				blunderPawns[3].HasMoved = true;
-				blunderPawns[4].HasMoved = true;
-				blunderPawns[5].HasMoved = true;
-				
+
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook, blunderQueen);
 
 				foreach (Pawn stalematedPawn in stalematedPawns) {

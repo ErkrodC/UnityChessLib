@@ -42,62 +42,47 @@ namespace UnityChess {
 			HalfMoveClock = halfMoveClock;
 			TurnNumber = turnNumber;
 		}
-		
-		public GameConditions CalculateEndingConditions(Board endingBoard, IList<HalfMove> halfMovesFromStart) {
-			if (halfMovesFromStart.Count == 0) return this;
+
+		public GameConditions CalculateEndingConditions(Board resultingBoard, HalfMove lastHalfMove) {
+			bool whiteKingMoved = lastHalfMove.Piece is King { OwningSide: Side.White };
+			bool whiteQueensideRookMoved = lastHalfMove is {
+				Piece: Rook { OwningSide: Side.White },
+				Move: { Start: { File: 1, Rank: 1 } }
+			};
+			bool whiteKingsideRookMoved = lastHalfMove is {
+				Piece: Rook { OwningSide: Side.White },
+				Move: { Start: { File: 8, Rank: 1 } }
+			};
 			
-			bool whiteEligibleForCastling = endingBoard.WhiteKing.Position.Equals(5, 1) && !endingBoard.WhiteKing.HasMoved;
-			bool blackEligibleForCastling = endingBoard.BlackKing.Position.Equals(5, 8) && !endingBoard.BlackKing.HasMoved;
-			int turnNumberAddend = SideToMove == Side.White
-				? halfMovesFromStart.Count / 2
-				: (halfMovesFromStart.Count + 1) / 2;
-			
-			return new GameConditions(
-				sideToMove: halfMovesFromStart.Count % 2 == 0 ? SideToMove : SideToMove.Complement(),
-				whiteCanCastleKingside: whiteEligibleForCastling && endingBoard[8, 1] is Rook { HasMoved: false },
-				whiteCanCastleQueenside: whiteEligibleForCastling && endingBoard[1, 1] is Rook { HasMoved: false },
-				blackCanCastleKingside: blackEligibleForCastling && endingBoard[8, 8] is Rook { HasMoved: false },
-				blackCanCastleQueenside: blackEligibleForCastling && endingBoard[1, 8] is Rook { HasMoved: false },
-				enPassantSquare: GetEndingEnPassantSquare(halfMovesFromStart[^1]),
-				halfMoveClock: GetEndingHalfMoveClock(halfMovesFromStart),
-				turnNumber: TurnNumber + turnNumberAddend
-			);
-		}
-		
-		public GameConditions CalculateEndingConditions(Board endingBoard, HalfMove lastHalfMove) {
-			bool whiteEligibleForCastling = endingBoard.WhiteKing.Position.Equals(5, 1) && !endingBoard.WhiteKing.HasMoved;
-			bool blackEligibleForCastling = endingBoard.BlackKing.Position.Equals(5, 8) && !endingBoard.BlackKing.HasMoved;
+			bool blackKingMoved = lastHalfMove.Piece is King { OwningSide: Side.Black };
+			bool blackQueensideRookMoved = lastHalfMove is {
+				Piece: Rook { OwningSide: Side.Black },
+				Move: { Start: { File: 1, Rank: 8 } }
+			};
+			bool blackKingsideRookMoved = lastHalfMove is {
+				Piece: Rook { OwningSide: Side.Black },
+				Move: { Start: { File: 8, Rank: 8 } }
+			};
 
 			return new GameConditions(
 				sideToMove: SideToMove.Complement(),
-				whiteCanCastleKingside: whiteEligibleForCastling && endingBoard[8, 1] is Rook { HasMoved: false },
-				whiteCanCastleQueenside: whiteEligibleForCastling && endingBoard[1, 1] is Rook { HasMoved: false },
-				blackCanCastleKingside: blackEligibleForCastling && endingBoard[8, 8] is Rook { HasMoved: false },
-				blackCanCastleQueenside: blackEligibleForCastling && endingBoard[1, 8] is Rook { HasMoved: false },
-				enPassantSquare: GetEndingEnPassantSquare(lastHalfMove),
+				whiteCanCastleKingside: WhiteCanCastleKingside && !whiteKingMoved && !whiteKingsideRookMoved,
+				whiteCanCastleQueenside: WhiteCanCastleKingside && !whiteKingMoved && !whiteQueensideRookMoved,
+				blackCanCastleKingside: BlackCanCastleKingside && !blackKingMoved && !blackKingsideRookMoved,
+				blackCanCastleQueenside: BlackCanCastleKingside && !blackKingMoved && !blackQueensideRookMoved,
+				enPassantSquare: GetNextEnPassantSquare(lastHalfMove),
 				halfMoveClock: GetNextHalfMoveClock(lastHalfMove, HalfMoveClock),
 				turnNumber: TurnNumber + (SideToMove == Side.White ? 0 : 1)
 			);
 		}
 
-		private int GetEndingHalfMoveClock(IEnumerable<HalfMove> movesFromStart) {
-			int endingHalfMoveClock = HalfMoveClock;
-			
-			foreach (HalfMove halfMove in movesFromStart) {
-				endingHalfMoveClock = GetNextHalfMoveClock(halfMove, endingHalfMoveClock);
-			}
-
-			return endingHalfMoveClock;
-		}
-		
-		private static int GetNextHalfMoveClock(HalfMove halfMove, int endingHalfMoveClock) {
-			return halfMove.Piece is Pawn || halfMove.CapturedPiece
+		private static int GetNextHalfMoveClock(HalfMove lastHalfMove, int endingHalfMoveClock) {
+			return lastHalfMove.Piece is Pawn || lastHalfMove.CapturedPiece
 				? 0
 				: endingHalfMoveClock + 1;
 		}
-
-		// NOTE ending en passant square can be determined from simply the last half move made.
-		private static Square GetEndingEnPassantSquare(HalfMove lastHalfMove) {
+		
+		private static Square GetNextEnPassantSquare(HalfMove lastHalfMove) {
 			Side lastTurnPieceColor = lastHalfMove.Piece.OwningSide;
 			int pawnStartingRank = lastTurnPieceColor == Side.White ? 2 : 7;
 			int pawnEndingRank = lastTurnPieceColor == Side.White ? 4 : 5;

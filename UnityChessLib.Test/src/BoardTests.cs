@@ -29,7 +29,6 @@ namespace UnityChess.Test {
 			Assert.AreEqual(expectedPosition, pawn.Position);
 			Assert.AreEqual(board[expectedPosition], pawn);
 			Assert.AreEqual(board[initialPosition], null);
-			Assert.True(pawn.HasMoved);
 		}
 
 		[Test]
