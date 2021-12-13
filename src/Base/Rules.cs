@@ -37,7 +37,7 @@ namespace UnityChess {
 			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					Piece piece = board[file, rank];
-					if (piece != null && piece.Color == player) sumOfLegalMoves += piece.LegalMoves.Count;;
+					if (piece != null && piece.OwningSide == player) sumOfLegalMoves += piece.LegalMoves.Count;;
 				}
 			}
 
@@ -58,13 +58,13 @@ namespace UnityChess {
 
 					Square testSquare = new Square(king.Position, fileOffset, rankOffset);
 
-					while (testSquare.IsValid && !board.IsOccupiedBySide(testSquare, king.Color)) {
-						if (board.IsOccupiedBySide(testSquare, king.Color.Complement())) {
+					while (testSquare.IsValid && !board.IsOccupiedBySide(testSquare, king.OwningSide)) {
+						if (board.IsOccupiedBySide(testSquare, king.OwningSide.Complement())) {
 							Piece piece = board[testSquare];
 
 							//diagonal direction
 							if (Math.Abs(fileOffset) == Math.Abs(rankOffset)) {
-								if (piece is Bishop || piece is Queen || testSquare.Rank == king.Position.Rank + (king.Color == Side.White ? 1 : -1)
+								if (piece is Bishop || piece is Queen || testSquare.Rank == king.Position.Rank + (king.OwningSide == Side.White ? 1 : -1)
 								    && (testSquare.File == king.Position.File + 1 || testSquare.File == king.Position.File - 1)
 								    && piece is Pawn) {
 									return true;
@@ -97,7 +97,7 @@ namespace UnityChess {
 				foreach (int rankOffset in knightRankOffset) {
 					Square testSquare = new Square(king.Position, fileOffset, rankOffset);
 
-					if (testSquare.IsValid && board.IsOccupiedBySide(testSquare, king.Color.Complement()) && board[testSquare] is Knight)
+					if (testSquare.IsValid && board.IsOccupiedBySide(testSquare, king.OwningSide.Complement()) && board[testSquare] is Knight)
 						return true;
 				}
 			}
@@ -113,7 +113,7 @@ namespace UnityChess {
 					Square testSquare = new Square(king.Position, fileOffset, rankOffset);
 
 					if (testSquare.IsValid) {
-						if ((fileOffset == 1 || fileOffset == -1) && rankOffset == (king.Color == Side.White ? 1 : -1))
+						if ((fileOffset == 1 || fileOffset == -1) && rankOffset == (king.OwningSide == Side.White ? 1 : -1))
 							pawnAttackingSquares.Add(testSquare);
 						surroundingSquares.Add(testSquare);
 					}

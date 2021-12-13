@@ -3,25 +3,21 @@
 namespace UnityChess {
 	public class FENSerializer : IGameSerializer {
 		public string Serialize(Game game) {
-			Board currentBoard = game.BoardTimeline.Current;
-			GameConditions currentGameConditions = game.StartingConditions.CalculateEndingGameConditions(currentBoard, game.HalfMoveTimeline.GetStartToCurrent());
+			GameConditions currentConditions = game.ConditionsTimeline.Current;
+			Square currentEnPassantSquare = currentConditions.EnPassantSquare;
 
-			return ConvertCurrentGameStateToFEN(currentBoard, currentGameConditions);
+			return
+				$"{CalculateBoardString(game.BoardTimeline.Current)}"
+				+ $" {(currentConditions.WhiteToMove ? "w" : "b")}"
+				+ $" {CalculateCastlingInfoString(currentConditions)}"
+				+ $" {(currentEnPassantSquare.IsValid ? SquareUtil.SquareToString(currentEnPassantSquare) : "-")}"
+				+ $" {currentConditions.HalfMoveClock}"
+				+ $" {currentConditions.TurnNumber}";
 		}
 		
 		// TODO implement
 		public Game Deserialize(string fen) {
 			throw new NotImplementedException();
-		}
-
-		private static string ConvertCurrentGameStateToFEN(Board currentBoard, GameConditions currentGameConditions) {
-			string toMoveString = currentGameConditions.WhiteToMove ? "w" : "b";
-
-			string enPassantSquareString = currentGameConditions.EnPassantSquare.IsValid ?
-				SquareUtil.SquareToString(currentGameConditions.EnPassantSquare) :
-				"-";
-
-			return $"{CalculateBoardString(currentBoard)} {toMoveString} {CalculateCastlingInfoString(currentGameConditions)} {enPassantSquareString} {currentGameConditions.HalfMoveClock} {currentGameConditions.TurnNumber}";
 		}
 
 		private static string CalculateBoardString(Board currentBoard) {
@@ -54,7 +50,7 @@ namespace UnityChess {
 		}
 
 		public static string GetFENPieceSymbol(Piece piece) {
-			bool isWhite = piece?.Color == Side.White;
+			bool isWhite = piece?.OwningSide == Side.White;
 
 			switch (piece) {
 				case Bishop:

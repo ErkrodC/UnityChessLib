@@ -34,10 +34,10 @@ namespace UnityChess {
 		}
 
 		public static Square StringToSquare(string squareText) {
-			int file = FileCharToIntMap[squareText.Substring(0, 1)];
-			int rank = int.Parse(squareText.Substring(1, 1));
-	
-			return new Square(file, rank);
+			return new Square(
+				FileCharToIntMap[squareText[0].ToString()],
+				int.Parse(squareText[1].ToString())
+			);
 		}
 	}
 }

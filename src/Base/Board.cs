@@ -113,13 +113,13 @@ namespace UnityChess {
 		
 		internal bool IsOccupied(Square position) => this[position] != null;
 
-		internal bool IsOccupiedBySide(Square position, Side side) => this[position] is Piece piece && piece.Color == side;
+		internal bool IsOccupiedBySide(Square position, Side side) => this[position] is Piece piece && piece.OwningSide == side;
 
 		public void InitKings() {
 			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					if (this[file, rank] is King king) {
-						if (king.Color == Side.White) WhiteKing = king;
+						if (king.OwningSide == Side.White) WhiteKing = king;
 						else BlackKing = king;
 					}
 				}

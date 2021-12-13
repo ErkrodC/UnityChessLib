@@ -2,7 +2,7 @@
 
 namespace UnityChess {
 	public class Knight : Piece {
-		public Knight(Square startingPosition, Side color) : base(startingPosition, color) {}
+		public Knight(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public Knight(Knight knightCopy) : base(knightCopy) {}
 
 		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
@@ -18,8 +18,8 @@ namespace UnityChess {
 					Square testSquare = new Square(Position, fileOffset, rankOffset);
 					Movement testMove = new Movement(Position, testSquare);
 
-					Square enemyKingPosition = Color == Side.White ? board.BlackKing.Position : board.WhiteKing.Position;
-					if (testSquare.IsValid && !board.IsOccupiedBySide(testSquare, Color) && Rules.MoveObeysRules(board, testMove, Color) && testSquare != enemyKingPosition)
+					Square enemyKingPosition = OwningSide == Side.White ? board.BlackKing.Position : board.WhiteKing.Position;
+					if (testSquare.IsValid && !board.IsOccupiedBySide(testSquare, OwningSide) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)
 						LegalMoves.Add(new Movement(testMove));
 				}
 			}

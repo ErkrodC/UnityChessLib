@@ -14,6 +14,12 @@
 			Rank = rank;
 		}
 
+		public Square(string squareString) {
+			this = string.IsNullOrEmpty(squareString)
+				? Invalid
+				: SquareUtil.StringToSquare(squareString);
+		}
+
 		internal Square(Square startPosition, int fileOffset, int rankOffset) {
 			File = startPosition.File + fileOffset;
 			Rank = startPosition.Rank + rankOffset;

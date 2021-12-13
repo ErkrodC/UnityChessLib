@@ -4,28 +4,25 @@ namespace UnityChess {
 	/// <summary>Representation of a standard chess game including a history of moves made.</summary>
 	public class Game {
 		public Mode Mode { get; }
-		public Side CurrentTurnSide { get; private set; }
+		public Side SideToMove { get; private set; }
 		public int LatestHalfMoveIndex => HalfMoveTimeline.HeadIndex;
-		public GameConditions StartingConditions { get; }
+		public Timeline<GameConditions> ConditionsTimeline { get; }
 		public Timeline<Board> BoardTimeline { get; }
 		public Timeline<HalfMove> HalfMoveTimeline { get; }
 		
-		private readonly Timeline<Square> enPassantCaptureSquareTimeline;
 
 		/// <summary>Creates a Game instance of a given mode with a standard starting Board.</summary>
 		/// <param name="mode">Describes which players are human or AI.</param>
 		/// <param name="startingConditions">Conditions at the time the board was set up.</param>
 		public Game(Mode mode, GameConditions startingConditions) {
 			Mode = mode;
-			CurrentTurnSide = Side.White;
-			StartingConditions = startingConditions;
-			BoardTimeline = new Timeline<Board>();
+			SideToMove = Side.White;
+
+			BoardTimeline = new Timeline<Board> { new Board() };
 			HalfMoveTimeline = new Timeline<HalfMove>();
-			enPassantCaptureSquareTimeline = new Timeline<Square>();
+			ConditionsTimeline = new Timeline<GameConditions> { startingConditions };
 			
-			BoardTimeline.AddNext(new Board());
-			enPassantCaptureSquareTimeline.AddNext(Square.Invalid);
-			UpdateAllPiecesLegalMoves(BoardTimeline.Current, enPassantCaptureSquareTimeline.Current, Side.White);
+			UpdateAllPiecesLegalMoves(BoardTimeline.Current, ConditionsTimeline.Current.EnPassantSquare, Side.White);
 		}
 
 		private Board LatestBoard => BoardTimeline.Current;
@@ -37,26 +34,28 @@ namespace UnityChess {
 			//create new copy of previous current board, and execute the move on it
 			Board boardBeforeMove = LatestBoard;
 			Square enPassantEligibleSquare = boardBeforeMove[validatedMove.Start] is Pawn pawn && Math.Abs(validatedMove.End.Rank - validatedMove.Start.Rank) == 2 ?
-				                          new Square(validatedMove.End, 0, pawn.Color == Side.White ? -1 : 1) :
+				                          new Square(validatedMove.End, 0, pawn.OwningSide == Side.White ? -1 : 1) :
 				                          Square.Invalid;
-			enPassantCaptureSquareTimeline.AddNext(enPassantEligibleSquare);
 
 			Board resultingBoard = new Board(LatestBoard);
 			resultingBoard.MovePiece(validatedMove);
 
 			BoardTimeline.AddNext(resultingBoard);
 
-			CurrentTurnSide = CurrentTurnSide.Complement();
+			SideToMove = SideToMove.Complement();
 			
-			UpdateAllPiecesLegalMoves(resultingBoard, enPassantCaptureSquareTimeline.Current, CurrentTurnSide);
+			UpdateAllPiecesLegalMoves(resultingBoard, enPassantEligibleSquare, SideToMove);
 
 			bool capturedPiece = boardBeforeMove[validatedMove.End] != null || validatedMove is EnPassantMove;
-			bool causedCheckmate = Rules.IsPlayerCheckmated(resultingBoard, CurrentTurnSide);
-			bool causedStalemate = Rules.IsPlayerStalemated(resultingBoard, CurrentTurnSide);
-			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, CurrentTurnSide) && !causedCheckmate;
+			bool causedCheckmate = Rules.IsPlayerCheckmated(resultingBoard, SideToMove);
+			bool causedStalemate = Rules.IsPlayerStalemated(resultingBoard, SideToMove);
+			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, SideToMove) && !causedCheckmate;
 
-			HalfMoveTimeline.AddNext(new HalfMove(boardBeforeMove[validatedMove.Start], validatedMove, capturedPiece, causedCheck, causedStalemate , causedCheckmate));
-
+			HalfMove halfMove = new HalfMove(boardBeforeMove[validatedMove.Start], validatedMove, capturedPiece, causedCheck, causedStalemate , causedCheckmate);
+			HalfMoveTimeline.AddNext(halfMove);
+			GameConditions nextGameConditions = ConditionsTimeline.Current.CalculateEndingConditions(boardBeforeMove, halfMove);
+			ConditionsTimeline.AddNext(nextGameConditions);
+			
 			return true;
 		}
 		
@@ -69,18 +68,18 @@ namespace UnityChess {
 			}
 
 			bool foundMove = movingPiece.LegalMoves.TryGetLegalMove(startSquare, endSquare, out move);
-			return movingPiece.Color == CurrentTurnSide && foundMove;
+			return movingPiece.OwningSide == SideToMove && foundMove;
 		}
 
 		public bool ResetGameToHalfMoveIndex(int halfMoveIndex) {
 			if (LatestHalfMoveIndex == -1) return false; // i.e. No possible move to reset to
 
 			BoardTimeline.HeadIndex = halfMoveIndex + 1;
-			enPassantCaptureSquareTimeline.HeadIndex = halfMoveIndex + 1;
+			ConditionsTimeline.HeadIndex = halfMoveIndex + 1;
 			HalfMoveTimeline.HeadIndex = halfMoveIndex;
-			CurrentTurnSide = halfMoveIndex % 2 == 0 ? Side.Black : Side.White;
+			SideToMove = halfMoveIndex % 2 == 0 ? Side.Black : Side.White;
 			
-			UpdateAllPiecesLegalMoves(BoardTimeline.Current, enPassantCaptureSquareTimeline.Current, CurrentTurnSide);
+			UpdateAllPiecesLegalMoves(BoardTimeline.Current, ConditionsTimeline.Current.EnPassantSquare, SideToMove);
 			return true;
 		}
 
@@ -89,7 +88,7 @@ namespace UnityChess {
 				for (int rank = 1; rank <= 8; rank++) {
 					Piece piece = board[file, rank];
 					if (piece == null) continue;
-						if (piece.Color == turn) piece.UpdateLegalMoves(board, enPassantEligibleSquare);
+						if (piece.OwningSide == turn) piece.UpdateLegalMoves(board, enPassantEligibleSquare);
 						else piece.LegalMoves.Clear();
 				}
 		}
