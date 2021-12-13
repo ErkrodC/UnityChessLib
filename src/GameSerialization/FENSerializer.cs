@@ -50,7 +50,7 @@ namespace UnityChess {
 		}
 
 		public static string GetFENPieceSymbol(Piece piece) {
-			bool isWhite = piece?.OwningSide == Side.White;
+			bool isWhite = piece?.Owner == Side.White;
 
 			switch (piece) {
 				case Bishop:

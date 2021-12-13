@@ -2,7 +2,7 @@
 	public class Pawn : Piece {
 		private static readonly int[] adjacentFileOffsets = {-1, 1};
 		
-		public Pawn(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
+		public Pawn(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 		public Pawn(Pawn pawnCopy) : base(pawnCopy) {}
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
@@ -12,25 +12,25 @@
 		}
 
 		private void CheckForwardMovingSquares(Board board) {
-			int forwardDirection = OwningSide.ForwardDirection();
+			int forwardDirection = Owner.ForwardDirection();
 			Square testSquare = new Square(Position, 0, forwardDirection);
 			Movement testMove = new Movement(Position, testSquare);
 			
 			if (!board.IsOccupiedAt(testSquare)
-			    && Rules.MoveObeysRules(board, testMove, OwningSide)
+			    && Rules.MoveObeysRules(board, testMove, Owner)
 			) {
 				LegalMoves.Add(
-					Position.Rank == OwningSide.Complement().PawnRank()
+					Position.Rank == Owner.Complement().PawnRank()
 						? new PromotionMove(Position, testSquare)
 						: new Movement(testMove)
 				);
 			}
 			
-			if (Position.Rank == OwningSide.PawnRank()) {
+			if (Position.Rank == Owner.PawnRank()) {
 				testSquare += new Square(0, forwardDirection);
 				testMove = new Movement(Position, testSquare);
 				if (!board.IsOccupiedAt(testSquare)
-				    && Rules.MoveObeysRules(board, testMove, OwningSide)
+				    && Rules.MoveObeysRules(board, testMove, Owner)
 				) {
 					LegalMoves.Add(new Movement(testMove));
 				}
@@ -39,20 +39,20 @@
 
 		private void CheckAttackingSquares(Board board) {
 			foreach (int fileOffset in adjacentFileOffsets) {
-				Square testSquare = Position + new Square(fileOffset, OwningSide.ForwardDirection());
+				Square testSquare = Position + new Square(fileOffset, Owner.ForwardDirection());
 				Movement testMove = new Movement(Position, testSquare);
 
-				Square enemyKingPosition = OwningSide == Side.White
+				Square enemyKingPosition = Owner == Side.White
 					? board.BlackKing.Position
 					: board.WhiteKing.Position;
 				
 				if (testSquare.IsValid()
-				    && board.IsOccupiedBySideAt(testSquare, OwningSide.Complement())
-				    && Rules.MoveObeysRules(board, testMove, OwningSide)
+				    && board.IsOccupiedBySideAt(testSquare, Owner.Complement())
+				    && Rules.MoveObeysRules(board, testMove, Owner)
 				    && testSquare != enemyKingPosition
 				) {
 					LegalMoves.Add(
-						Position.Rank == OwningSide.Complement().PawnRank()
+						Position.Rank == Owner.Complement().PawnRank()
 							? new PromotionMove(Position, testSquare)
 							: new Movement(testMove)
 					);
@@ -61,16 +61,16 @@
 		}
 
 		private void CheckEnPassantCaptures(Board board, Square enPassantEligibleSquare) {
-			int enPassantCaptureRank = OwningSide == Side.White ? 5 : 4;
+			int enPassantCaptureRank = Owner == Side.White ? 5 : 4;
 			if (Position.Rank != enPassantCaptureRank) {
 				return;
 			}
 
-			Square lateralSquare = enPassantEligibleSquare + new Square(0, -OwningSide.ForwardDirection());
+			Square lateralSquare = enPassantEligibleSquare + new Square(0, -Owner.ForwardDirection());
 			if (lateralSquare.IsValid()
 			    && board[lateralSquare] is Pawn enemyPawn
-			    && enemyPawn.OwningSide != OwningSide
-			    && Rules.MoveObeysRules(board, new EnPassantMove(Position, enPassantEligibleSquare, enemyPawn), OwningSide)
+			    && enemyPawn.Owner != Owner
+			    && Rules.MoveObeysRules(board, new EnPassantMove(Position, enPassantEligibleSquare, enemyPawn), Owner)
 			) {
 				LegalMoves.Add(new EnPassantMove(Position, enPassantEligibleSquare, enemyPawn));
 			}

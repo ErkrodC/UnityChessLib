@@ -44,23 +44,23 @@ namespace UnityChess {
 		}
 
 		public GameConditions CalculateEndingConditions(Board resultingBoard, HalfMove lastHalfMove) {
-			bool whiteKingMoved = lastHalfMove.Piece is King { OwningSide: Side.White };
+			bool whiteKingMoved = lastHalfMove.Piece is King { Owner: Side.White };
 			bool whiteQueensideRookMoved = lastHalfMove is {
-				Piece: Rook { OwningSide: Side.White },
+				Piece: Rook { Owner: Side.White },
 				Move: { Start: { File: 1, Rank: 1 } }
 			};
 			bool whiteKingsideRookMoved = lastHalfMove is {
-				Piece: Rook { OwningSide: Side.White },
+				Piece: Rook { Owner: Side.White },
 				Move: { Start: { File: 8, Rank: 1 } }
 			};
 			
-			bool blackKingMoved = lastHalfMove.Piece is King { OwningSide: Side.Black };
+			bool blackKingMoved = lastHalfMove.Piece is King { Owner: Side.Black };
 			bool blackQueensideRookMoved = lastHalfMove is {
-				Piece: Rook { OwningSide: Side.Black },
+				Piece: Rook { Owner: Side.Black },
 				Move: { Start: { File: 1, Rank: 8 } }
 			};
 			bool blackKingsideRookMoved = lastHalfMove is {
-				Piece: Rook { OwningSide: Side.Black },
+				Piece: Rook { Owner: Side.Black },
 				Move: { Start: { File: 8, Rank: 8 } }
 			};
 
@@ -83,7 +83,7 @@ namespace UnityChess {
 		}
 		
 		private static Square GetNextEnPassantSquare(HalfMove lastHalfMove) {
-			Side lastTurnPieceColor = lastHalfMove.Piece.OwningSide;
+			Side lastTurnPieceColor = lastHalfMove.Piece.Owner;
 			int pawnStartingRank = lastTurnPieceColor == Side.White ? 2 : 7;
 			int pawnEndingRank = lastTurnPieceColor == Side.White ? 4 : 5;
 

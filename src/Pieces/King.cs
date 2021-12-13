@@ -2,13 +2,13 @@
 	public class King : Piece {
 		private static readonly int[] rookFiles = { 1, 8 };
 		
-		public King(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
+		public King(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 		public King(King kingCopy) : base(kingCopy) {}
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckSurroundingSquares(board);
 
-			if (OwningSide == Side.White) {
+			if (Owner == Side.White) {
 				CheckCastlingMoves(
 					board,
 					gameConditions.WhiteCanCastleKingside,
@@ -27,13 +27,13 @@
 			foreach (Square offset in SquareUtil.SurroundingOffsets) {
 				Square testSquare = Position + offset;
 				Movement testMove = new Movement(Position, testSquare);
-				Square enemyKingPosition = OwningSide == Side.White
+				Square enemyKingPosition = Owner == Side.White
 					? board.BlackKing.Position
 					: board.WhiteKing.Position;
 				
 				if (testSquare.IsValid()
-				    && !board.IsOccupiedBySideAt(testSquare, OwningSide)
-				    && Rules.MoveObeysRules(board, testMove, OwningSide)
+				    && !board.IsOccupiedBySideAt(testSquare, Owner)
+				    && Rules.MoveObeysRules(board, testMove, Owner)
 				    && testSquare != enemyKingPosition
 				) {
 					LegalMoves.Add(new Movement(testMove));
@@ -42,17 +42,17 @@
 		}
 
 		private void CheckCastlingMoves(Board board, bool canCastleKingSide, bool canCastleQueenside) {
-			if (Rules.IsPlayerInCheck(board, OwningSide)
+			if (Rules.IsPlayerInCheck(board, Owner)
 				|| !canCastleKingSide && !canCastleQueenside
 			) { return; }
 
-			int castlingRank = OwningSide.CastlingRank();
+			int castlingRank = Owner.CastlingRank();
 			
 			foreach (int rookFile in rookFiles) {
 				bool checkingQueenside = rookFile == 1;
 				
 				if (board[rookFile, castlingRank] is not Rook rook
-				    || rook.OwningSide != OwningSide
+				    || rook.Owner != Owner
 				    || checkingQueenside && !canCastleQueenside
 				    || !checkingQueenside && !canCastleKingSide
 				) {
@@ -68,8 +68,8 @@
 				if (!board.IsOccupiedAt(inBetweenSquare0)
 				    && !board.IsOccupiedAt(inBetweenSquare1)
 				    && (!board.IsOccupiedAt(inBetweenSquare2) || !checkingQueenside)
-				    && Rules.MoveObeysRules(board, inBetweenMove0, OwningSide)
-				    && Rules.MoveObeysRules(board, inBetweenMove1, OwningSide)
+				    && Rules.MoveObeysRules(board, inBetweenMove0, Owner)
+				    && Rules.MoveObeysRules(board, inBetweenMove1, Owner)
 				) {
 					LegalMoves.Add(new CastlingMove(Position, inBetweenSquare1, rook));
 				}

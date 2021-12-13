@@ -1,6 +1,6 @@
 ﻿namespace UnityChess {
 	public class Rook : Piece {
-		public Rook(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
+		public Rook(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 		public Rook(Rook rookCopy) : base(rookCopy) {}
 		
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
@@ -14,13 +14,13 @@
 				while (testSquare.IsValid()) {
 					Movement testMove = new Movement(Position, testSquare);
 					
-					Square enemyKingPosition = OwningSide == Side.White
+					Square enemyKingPosition = Owner == Side.White
 						? board.BlackKing.Position
 						: board.WhiteKing.Position;
 					
 					if (board.IsOccupiedAt(testSquare)) {
-						if (!board.IsOccupiedBySideAt(testSquare, OwningSide)
-						    && Rules.MoveObeysRules(board, testMove, OwningSide)
+						if (!board.IsOccupiedBySideAt(testSquare, Owner)
+						    && Rules.MoveObeysRules(board, testMove, Owner)
 						    && testSquare != enemyKingPosition
 						) {
 							LegalMoves.Add(new Movement(testMove));
@@ -29,7 +29,7 @@
 						break;
 					}
 
-					if (Rules.MoveObeysRules(board, testMove, OwningSide)
+					if (Rules.MoveObeysRules(board, testMove, Owner)
 					    && testSquare != enemyKingPosition
 					) {
 						LegalMoves.Add(new Movement(testMove));

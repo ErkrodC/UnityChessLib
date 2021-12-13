@@ -1,6 +1,6 @@
 ﻿namespace UnityChess {
 	public class Bishop : Piece {
-		public Bishop(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
+		public Bishop(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 		public Bishop(Bishop bishopCopy) : base(bishopCopy) {}
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
@@ -8,7 +8,7 @@
 		}
 
 		private void CheckDiagonalDirections(Board board) {
-			Square enemyKingPosition = OwningSide == Side.White
+			Square enemyKingPosition = Owner == Side.White
 				? board.BlackKing.Position
 				: board.WhiteKing.Position;
 			
@@ -19,8 +19,8 @@
 					Movement testMove = new Movement(Position, testSquare);
 					
 					if (board.IsOccupiedAt(testSquare)) {
-						if (!board.IsOccupiedBySideAt(testSquare, OwningSide)
-							&& Rules.MoveObeysRules(board, testMove, OwningSide)
+						if (!board.IsOccupiedBySideAt(testSquare, Owner)
+							&& Rules.MoveObeysRules(board, testMove, Owner)
 							&& testSquare != enemyKingPosition
 						) {
 							LegalMoves.Add(new Movement(testMove));
@@ -29,7 +29,7 @@
 						break;
 					}
 
-					if (Rules.MoveObeysRules(board, testMove, OwningSide)
+					if (Rules.MoveObeysRules(board, testMove, Owner)
 						&& testSquare != enemyKingPosition
 					) {
 						LegalMoves.Add(new Movement(testMove));

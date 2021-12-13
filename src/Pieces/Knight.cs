@@ -1,6 +1,6 @@
 ﻿namespace UnityChess {
 	public class Knight : Piece {
-		public Knight(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
+		public Knight(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 		public Knight(Knight knightCopy) : base(knightCopy) {}
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
@@ -11,13 +11,13 @@
 			foreach (Square offset in SquareUtil.KnightOffsets) {
 				Square testSquare = Position + offset;
 				Movement testMove = new Movement(Position, testSquare);
-				Square enemyKingPosition = OwningSide == Side.White
+				Square enemyKingPosition = Owner == Side.White
 					? board.BlackKing.Position
 					: board.WhiteKing.Position;
 				
 				if (testSquare.IsValid()
-				    && !board.IsOccupiedBySideAt(testSquare, OwningSide)
-				    && Rules.MoveObeysRules(board, testMove, OwningSide)
+				    && !board.IsOccupiedBySideAt(testSquare, Owner)
+				    && Rules.MoveObeysRules(board, testMove, Owner)
 				    && testSquare != enemyKingPosition
 				) {
 					LegalMoves.Add(new Movement(testMove));

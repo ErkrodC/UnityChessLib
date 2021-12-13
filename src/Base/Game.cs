@@ -63,7 +63,7 @@ namespace UnityChess {
 			}
 
 			bool foundMove = movingPiece.LegalMoves.TryGetLegalMove(startSquare, endSquare, out move);
-			return movingPiece.OwningSide == SideToMove && foundMove;
+			return movingPiece.Owner == SideToMove && foundMove;
 		}
 
 		public bool ResetGameToHalfMoveIndex(int halfMoveIndex) {
@@ -83,7 +83,7 @@ namespace UnityChess {
 				for (int rank = 1; rank <= 8; rank++) {
 					if (board[file, rank] is Piece piece) {
 						piece.LegalMoves.Clear();
-						if (piece.OwningSide == gameConditions.SideToMove) {
+						if (piece.Owner == gameConditions.SideToMove) {
 							piece.UpdateLegalMoves(board, gameConditions);
 						}
 					}

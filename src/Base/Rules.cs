@@ -36,7 +36,7 @@ namespace UnityChess {
 			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					Piece piece = board[file, rank];
-					if (piece != null && piece.OwningSide == player) sumOfLegalMoves += piece.LegalMoves.Count;;
+					if (piece != null && piece.Owner == player) sumOfLegalMoves += piece.LegalMoves.Count;;
 				}
 			}
 
@@ -44,7 +44,7 @@ namespace UnityChess {
 		}
 
 		private static bool IsPieceAttacked(Board board, Piece friendlyPiece) {
-			Side friendlySide = friendlyPiece.OwningSide;
+			Side friendlySide = friendlyPiece.Owner;
 			Side enemySide = friendlySide.Complement();
 			int friendlyForward = friendlySide.ForwardDirection();
 
@@ -82,7 +82,7 @@ namespace UnityChess {
 				
 				if (testSquare.IsValid()
 				    && board[testSquare] is Knight knight
-				    && knight.OwningSide == enemySide
+				    && knight.Owner == enemySide
 				) {
 					return true;
 				}
