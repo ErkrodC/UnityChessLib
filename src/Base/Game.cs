@@ -79,7 +79,7 @@ namespace UnityChess {
 		}
 
 		internal static void UpdateAllPiecesLegalMoves(Board board, GameConditions gameConditions) {
-			for (int file = 1; file <= 8; file++)
+			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					if (board[file, rank] is Piece piece) {
 						piece.LegalMoves.Clear();
@@ -88,6 +88,7 @@ namespace UnityChess {
 						}
 					}
 				}
+			}
 		}
 	}
 }
