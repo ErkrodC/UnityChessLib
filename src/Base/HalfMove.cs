@@ -7,8 +7,8 @@ namespace UnityChess {
 		public readonly Movement Move;
 		public readonly bool CapturedPiece;
 		public readonly bool CausedCheck;
-		public readonly bool CausedStalemate;
-		public readonly bool CausedCheckmate;
+		public bool CausedStalemate { get; private set; }
+		public bool CausedCheckmate { get; private set; }
 		
 		private static readonly Dictionary<Type, string> pieceTypeToANSymbolMap = new Dictionary<Type, string> {
 			{ typeof(Pawn), "" },
@@ -19,11 +19,16 @@ namespace UnityChess {
 			{ typeof(King), "K" },		
 		};
 
-		public HalfMove(Piece piece, Movement move, bool capturedPiece, bool causedCheck, bool causedStalemate, bool causedCheckmate) {
+		public HalfMove(Piece piece, Movement move, bool capturedPiece, bool causedCheck) {
 			Piece = piece;
 			Move = move;
 			CapturedPiece = capturedPiece;
 			CausedCheck = causedCheck;
+			CausedCheckmate = default;
+			CausedStalemate = default;
+		}
+
+		public void SetGameEndBools(bool causedStalemate, bool causedCheckmate) {
 			CausedCheckmate = causedCheckmate;
 			CausedStalemate = causedStalemate;
 		}
@@ -36,8 +41,11 @@ namespace UnityChess {
 
 			string capture = CapturedPiece ? "x" : string.Empty;
 			string endSquare = SquareUtil.SquareToString(Move.End);
-			string suffix = CausedCheckmate ? "#" :
-			                CausedCheck     ? "+" : string.Empty;
+			string suffix = CausedCheckmate
+				? "#"
+				: CausedCheck
+					? "+"
+					: string.Empty;
 
 			string moveText;
 			switch (Piece) {

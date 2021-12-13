@@ -5,9 +5,7 @@
 		public King(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public King(King kingCopy) : base(kingCopy) {}
 
-		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
-			LegalMoves.Clear();
-
+		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckSurroundingSquares(board);
 			CheckCastlingMoves(board);
 		}

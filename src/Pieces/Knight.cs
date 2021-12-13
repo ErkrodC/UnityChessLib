@@ -3,8 +3,7 @@
 		public Knight(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public Knight(Knight knightCopy) : base(knightCopy) {}
 
-		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
-			LegalMoves.Clear();
+		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckKnightSquares(board);
 		}
 

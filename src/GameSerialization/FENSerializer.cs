@@ -8,7 +8,7 @@ namespace UnityChess {
 
 			return
 				$"{CalculateBoardString(game.BoardTimeline.Current)}"
-				+ $" {(currentConditions.WhiteToMove ? "w" : "b")}"
+				+ $" {(currentConditions.SideToMove == Side.White ? "w" : "b")}"
 				+ $" {CalculateCastlingInfoString(currentConditions)}"
 				+ $" {(currentEnPassantSquare.IsValid() ? SquareUtil.SquareToString(currentEnPassantSquare) : "-")}"
 				+ $" {currentConditions.HalfMoveClock}"

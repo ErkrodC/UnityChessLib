@@ -3,9 +3,7 @@
 		public Queen(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public Queen(Queen queenCopy) : base(queenCopy) {}
 
-		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
-			LegalMoves.Clear();
-
+		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckRoseDirections(board);
 		}
 

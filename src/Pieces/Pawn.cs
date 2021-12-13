@@ -5,12 +5,10 @@
 		public Pawn(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public Pawn(Pawn pawnCopy) : base(pawnCopy) {}
 
-		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
-			LegalMoves.Clear();
-
+		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckForwardMovingSquares(board);
 			CheckAttackingSquares(board);
-			CheckEnPassantCaptures(board, enPassantEligibleSquare);
+			CheckEnPassantCaptures(board, gameConditions.EnPassantSquare);
 		}
 
 		private void CheckForwardMovingSquares(Board board) {

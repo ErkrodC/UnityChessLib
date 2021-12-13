@@ -3,8 +3,7 @@
 		public Bishop(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public Bishop(Bishop bishopCopy) : base(bishopCopy) {}
 
-		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
-			LegalMoves.Clear();
+		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckDiagonalDirections(board);
 		}
 

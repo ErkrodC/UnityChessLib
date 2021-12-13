@@ -22,7 +22,7 @@ namespace UnityChess {
 			LegalMoves = pieceCopy.LegalMoves.DeepCopy();
 		}
 
-		public abstract void UpdateLegalMoves(Board board, Square enPassantEligibleSquare);
+		public abstract void UpdateLegalMoves(Board board, GameConditions gameConditions);
 
 		public Piece DeepCopy() {
 			Type derivedType = GetType();

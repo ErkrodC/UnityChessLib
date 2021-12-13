@@ -22,9 +22,12 @@ namespace UnityChess.Test {
 			Mock<Piece> mockPiece = new Mock<Piece>(Square.Invalid, Side.White);
 			PopulateBoard(numberOfPieces, mockPiece);
 
-			Game.UpdateAllPiecesLegalMoves(board, Square.Invalid, Side.White);
+			Game.UpdateAllPiecesLegalMoves(board, GameConditions.NormalStartingConditions);
 
-			mockPiece.Verify(piece => piece.UpdateLegalMoves(board, Square.Invalid), Times.Exactly(numberOfPieces));
+			mockPiece.Verify(
+				piece => piece.UpdateLegalMoves(board, GameConditions.NormalStartingConditions),
+				Times.Exactly(numberOfPieces)
+			);
 		}
 
 		private void PopulateBoard(int numberOfPieces, Mock<Piece> mockPiece) {

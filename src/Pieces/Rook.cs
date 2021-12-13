@@ -3,8 +3,7 @@
 		public Rook(Square startingPosition, Side owningSide) : base(startingPosition, owningSide) {}
 		public Rook(Rook rookCopy) : base(rookCopy) {}
 		
-		public override void UpdateLegalMoves(Board board, Square enPassantEligibleSquare) {
-			LegalMoves.Clear();
+		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckCardinalDirections(board);
 		}
 

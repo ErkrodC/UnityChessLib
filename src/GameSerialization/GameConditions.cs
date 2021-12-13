@@ -4,7 +4,7 @@ namespace UnityChess {
 	/// Non-board, non-move-record game state
 	public struct GameConditions {
 		public static GameConditions NormalStartingConditions = new GameConditions(
-			whiteToMove: true,
+			sideToMove: Side.White,
 			whiteCanCastleKingside: true,
 			whiteCanCastleQueenside: true,
 			blackCanCastleKingside: true,
@@ -14,7 +14,7 @@ namespace UnityChess {
 			turnNumber: 1
 		);
 		
-		public readonly bool WhiteToMove;
+		public readonly Side SideToMove;
 		public readonly bool WhiteCanCastleKingside;
 		public readonly bool WhiteCanCastleQueenside;
 		public readonly bool BlackCanCastleKingside;
@@ -24,7 +24,7 @@ namespace UnityChess {
 		public readonly int TurnNumber;
 	
 		public GameConditions(
-			bool whiteToMove,
+			Side sideToMove,
 			bool whiteCanCastleKingside,
 			bool whiteCanCastleQueenside,
 			bool blackCanCastleKingside,
@@ -33,7 +33,7 @@ namespace UnityChess {
 			int halfMoveClock,
 			int turnNumber
 		) {
-			WhiteToMove = whiteToMove;
+			SideToMove = sideToMove;
 			WhiteCanCastleKingside = whiteCanCastleKingside;
 			WhiteCanCastleQueenside = whiteCanCastleQueenside;
 			BlackCanCastleKingside = blackCanCastleKingside;
@@ -48,16 +48,19 @@ namespace UnityChess {
 			
 			bool whiteEligibleForCastling = endingBoard.WhiteKing.Position.Equals(5, 1) && !endingBoard.WhiteKing.HasMoved;
 			bool blackEligibleForCastling = endingBoard.BlackKing.Position.Equals(5, 8) && !endingBoard.BlackKing.HasMoved;
-
+			int turnNumberAddend = SideToMove == Side.White
+				? halfMovesFromStart.Count / 2
+				: (halfMovesFromStart.Count + 1) / 2;
+			
 			return new GameConditions(
-				whiteToMove: halfMovesFromStart.Count % 2 == 0 ? WhiteToMove : !WhiteToMove,
+				sideToMove: halfMovesFromStart.Count % 2 == 0 ? SideToMove : SideToMove.Complement(),
 				whiteCanCastleKingside: whiteEligibleForCastling && endingBoard[8, 1] is Rook { HasMoved: false },
 				whiteCanCastleQueenside: whiteEligibleForCastling && endingBoard[1, 1] is Rook { HasMoved: false },
 				blackCanCastleKingside: blackEligibleForCastling && endingBoard[8, 8] is Rook { HasMoved: false },
 				blackCanCastleQueenside: blackEligibleForCastling && endingBoard[1, 8] is Rook { HasMoved: false },
 				enPassantSquare: GetEndingEnPassantSquare(halfMovesFromStart[^1]),
 				halfMoveClock: GetEndingHalfMoveClock(halfMovesFromStart),
-				turnNumber: TurnNumber + (WhiteToMove ? halfMovesFromStart.Count / 2 : (halfMovesFromStart.Count + 1) / 2)
+				turnNumber: TurnNumber + turnNumberAddend
 			);
 		}
 		
@@ -66,14 +69,14 @@ namespace UnityChess {
 			bool blackEligibleForCastling = endingBoard.BlackKing.Position.Equals(5, 8) && !endingBoard.BlackKing.HasMoved;
 
 			return new GameConditions(
-				whiteToMove: !WhiteToMove,
+				sideToMove: SideToMove.Complement(),
 				whiteCanCastleKingside: whiteEligibleForCastling && endingBoard[8, 1] is Rook { HasMoved: false },
 				whiteCanCastleQueenside: whiteEligibleForCastling && endingBoard[1, 1] is Rook { HasMoved: false },
 				blackCanCastleKingside: blackEligibleForCastling && endingBoard[8, 8] is Rook { HasMoved: false },
 				blackCanCastleQueenside: blackEligibleForCastling && endingBoard[1, 8] is Rook { HasMoved: false },
 				enPassantSquare: GetEndingEnPassantSquare(lastHalfMove),
 				halfMoveClock: GetNextHalfMoveClock(lastHalfMove, HalfMoveClock),
-				turnNumber: TurnNumber + (WhiteToMove ? 0 : 1)
+				turnNumber: TurnNumber + (SideToMove == Side.White ? 0 : 1)
 			);
 		}
 
@@ -88,9 +91,9 @@ namespace UnityChess {
 		}
 		
 		private static int GetNextHalfMoveClock(HalfMove halfMove, int endingHalfMoveClock) {
-			return halfMove.Piece is not Pawn && !halfMove.CapturedPiece
-				? endingHalfMoveClock + 1
-				: 0;
+			return halfMove.Piece is Pawn || halfMove.CapturedPiece
+				? 0
+				: endingHalfMoveClock + 1;
 		}
 
 		// NOTE ending en passant square can be determined from simply the last half move made.

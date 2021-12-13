@@ -108,15 +108,36 @@ namespace UnityChess.Test {
 			WhiteWhiteKingside,
 			KingWhiteKingside
 		}
-
-		// ER TODO remove
-		private static Square tempSquare = Square.Invalid;
+		
+		private static Dictionary<Side, GameConditions> dummyConditionsBySide = new Dictionary<Side, GameConditions> {
+			[Side.White] = new GameConditions(
+				sideToMove: Side.White,
+				whiteCanCastleKingside: false,
+				whiteCanCastleQueenside: false,
+				blackCanCastleKingside: false,
+				blackCanCastleQueenside: false,
+				enPassantSquare: Square.Invalid,
+				halfMoveClock: 0,
+				turnNumber: 1
+			),
+			[Side.Black] = new GameConditions(
+				sideToMove: Side.Black,
+				whiteCanCastleKingside: false,
+				whiteCanCastleQueenside: false,
+				blackCanCastleKingside: false,
+				blackCanCastleQueenside: false,
+				enPassantSquare: Square.Invalid,
+				halfMoveClock: 0,
+				turnNumber: 1
+			)
+		};
+		
 		private static class RulesTestData {
 			private static void StartingPositionNone(Board board, Side side) {
 				board.SetStartingPosition();
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void BishopPinRookNone(Board board, Side side) {
@@ -128,7 +149,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, pinnedKing, pinnedRook, pinningKing, pinningBishop);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void RookPinBishopNone(Board board, Side side) {
@@ -140,7 +161,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, pinnedKing, pinnedBishop, pinningKing, pinningRook);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void NeutralKnightNone(Board board, Side side) {
@@ -151,7 +172,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, defensiveKing, offensiveKing, offensiveKnight);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void NeutralPawnsNone(Board board, Side side) {
@@ -175,7 +196,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, defensiveKing, offensiveKing, offensivePawn1, offensivePawn2);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static PositionInitializer QueenCheck(Direction direction) {
@@ -219,7 +240,7 @@ namespace UnityChess.Test {
 					PlacePieces(board, checkedKing, checkingKing, checkingQueen);
 
 					board.InitKings();
-					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
 
@@ -252,7 +273,7 @@ namespace UnityChess.Test {
 					PlacePieces(board, checkedKing, checkingKing, checkingRook);
 
 					board.InitKings();
-					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
 
@@ -285,7 +306,7 @@ namespace UnityChess.Test {
 					PlacePieces(board, checkedKing, checkingKing, checkingBishop);
 
 					board.InitKings();
-					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
 
@@ -330,7 +351,7 @@ namespace UnityChess.Test {
 					PlacePieces(board, checkedKing, checkingKing, checkingKnight);
 
 					board.InitKings();
-					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
 
@@ -371,7 +392,7 @@ namespace UnityChess.Test {
 					PlacePieces(board, checkedKing, checkingKing, checkingPawn);
 
 					board.InitKings();
-					Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
 
@@ -393,7 +414,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, blunderKing, blunderPawn);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingRookStalemate(Board board, Side side) {
@@ -404,7 +425,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingBishopStalemate(Board board, Side side) {
@@ -415,7 +436,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, blunderKing, blunderBishop);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void RookPinBishopStalemate(Board board, Side side) {
@@ -427,7 +448,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook, stalematedBishop);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void QueenStalemate(Board board, Side side) {
@@ -438,7 +459,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, blunderKing, blunderQueen);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void AnandVsKramnikStalemate(Board board, Side side) {
@@ -470,7 +491,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderPawn1, blunderPawn2);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KorchnoiVsKarpovStalemate(Board board, Side side) {
@@ -503,7 +524,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderBishop, blunderPawn);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void BernsteinVsSmyslovStalemate(Board board, Side side) {
@@ -527,7 +548,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook, blunderPawn);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void GelfandVsKramnikStalemate(Board board, Side side) {
@@ -595,7 +616,7 @@ namespace UnityChess.Test {
 				}
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void DoubleRookCheckmate(Board board, Side side) {
@@ -608,7 +629,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningRook1, winningRook2);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingQueenCheckmate(Board board, Side side) {
@@ -620,7 +641,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningQueen);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingRookCheckmate(Board board, Side side) {
@@ -631,7 +652,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningRook);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingDoubleBishopCheckmate(Board board, Side side) {
@@ -643,7 +664,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningBishop1, winningBishop2);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingBishopKnightCheckmate(Board board, Side side) {
@@ -655,7 +676,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningBishop, winningKnight);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingDoubleKnightCheckmate(Board board, Side side) {
@@ -667,7 +688,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningKnight1, winningKnight2);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KingDoublePawnCheckmate(Board board, Side side) {
@@ -691,7 +712,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningPawn1, winningPawn2);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void BackRankCheckmate(Board board, Side side) {
@@ -721,7 +742,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningRook, losingPawn1, losingPawn2, losingPawn3);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void SmotheredCheckmate(Board board, Side side) {
@@ -751,7 +772,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningKnight, losingPawn1, losingPawn2, losingRook);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void KnightRookCheckmate(Board board, Side side) {
@@ -763,7 +784,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningKnight, winningRook);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void QueenBishopCheckmate(Board board, Side side) {
@@ -775,7 +796,7 @@ namespace UnityChess.Test {
 				PlacePieces(board, checkmatedKing, winningKing, winningQueen, winningBishop);
 
 				board.InitKings();
-				Game.UpdateAllPiecesLegalMoves(board, tempSquare, side);
+				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
 			private static void PlacePieces(Board board, params Piece[] pieces) {
