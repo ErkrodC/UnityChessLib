@@ -1,9 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace UnityChess {
 	/// <summary>Contains methods for checking legality of moves and board positions.</summary>
 	public static class Rules {
+		private static readonly Square[] knightOffsets = {
+			new Square(-2, -1),
+			new Square(-2, 1),
+			new Square(2, -1),
+			new Square(2, 1),
+			new Square(-1, -2),
+			new Square(-1, 2),
+			new Square(1, -2),
+			new Square(1, 2),
+		};
+		
+		private static readonly Square[] surroundingOffsets = {
+			new Square(-1, 0),
+			new Square(1, 0),
+			new Square(0, -1),
+			new Square(0, 1),
+			new Square(-1, 1),
+			new Square(-1, -1),
+			new Square(1, -1),
+			new Square(1, 1)
+		};
+
 		/// <summary>Checks if the player of the given side has been checkmated.</summary>
 		public static bool IsPlayerCheckmated(Board board, Side player) => PlayerHasNoLegalMoves(player, board) && IsPlayerInCheck(board, player);
 
@@ -11,7 +32,7 @@ namespace UnityChess {
 		public static bool IsPlayerStalemated(Board board, Side player) => PlayerHasNoLegalMoves(player, board) && !IsPlayerInCheck(board, player);
 
 		/// <summary>Checks if the player of the given side is in check.</summary>
-		public static bool IsPlayerInCheck(Board board, Side player) => IsKingInCheck(board, player == Side.White ? board.WhiteKing : board.BlackKing);
+		public static bool IsPlayerInCheck(Board board, Side player) => IsPieceAttacked(board, player == Side.White ? board.WhiteKing : board.BlackKing);
 
 		internal static bool MoveObeysRules(Board board, Movement move, Side movedPieceSide) => !MovePutsMoverInCheck(board, move, movedPieceSide) && MoveRemovesCheckFromPlayerIfNeeded(board, move, movedPieceSide);
 
@@ -44,81 +65,52 @@ namespace UnityChess {
 			return sumOfLegalMoves == 0;
 		}
 
-		private static bool IsKingInCheck(Board board, King king) => IsCheckedRoseDirections(board, king) || IsCheckedKnightDirections(board, king);
+		private static bool IsPieceAttacked(Board board, Piece friendlyPiece) {
+			Side friendlySide = friendlyPiece.OwningSide;
+			Side enemySide = friendlySide.Complement();
+			int friendlyForward = friendlySide.ForwardDirection();
 
-		private static bool IsCheckedRoseDirections(Board board, King king) {
-			List<Square> surroundingSquares = new List<Square>();
-			List<Square> pawnAttackingSquares = new List<Square>();
+			foreach (Square offset in surroundingOffsets) {
+				bool isDiagonalOffset = Math.Abs(offset.File) == Math.Abs(offset.Rank);
+				Square friendlySquare = friendlyPiece.Position;
+				Square testSquare = friendlySquare + offset;
 
-			GenerateSquareLists(surroundingSquares, pawnAttackingSquares, king);
+				while (testSquare.IsValid() && !board.IsOccupiedBySide(testSquare, friendlySide)) {
+					if (board.IsOccupiedBySide(testSquare, enemySide)) {
+						int fileDistance = Math.Abs(testSquare.File - friendlySquare.File);
+						int rankDistance = Math.Abs(testSquare.Rank - friendlySquare.Rank);
 
-			foreach (int fileOffset in new[] {-1, 0, 1})
-				foreach (int rankOffset in new[] {-1, 0, 1}) {
-					if (fileOffset == 0 && rankOffset == 0) continue;
-
-					Square testSquare = new Square(king.Position, fileOffset, rankOffset);
-
-					while (testSquare.IsValid && !board.IsOccupiedBySide(testSquare, king.OwningSide)) {
-						if (board.IsOccupiedBySide(testSquare, king.OwningSide.Complement())) {
-							Piece piece = board[testSquare];
-
-							//diagonal direction
-							if (Math.Abs(fileOffset) == Math.Abs(rankOffset)) {
-								if (piece is Bishop || piece is Queen || testSquare.Rank == king.Position.Rank + (king.OwningSide == Side.White ? 1 : -1)
-								    && (testSquare.File == king.Position.File + 1 || testSquare.File == king.Position.File - 1)
-								    && piece is Pawn) {
-									return true;
-								}
-
-								if (piece is King && surroundingSquares.Contains(piece.Position) || piece is Pawn && pawnAttackingSquares.Contains(piece.Position)) {
-									return true;
-								}
-							}
-							//cardinal directions
-							else if (piece is Rook || piece is Queen || piece is King && surroundingSquares.Contains(piece.Position)) {
+						Piece enemyPiece = board[testSquare];
+						switch (enemyPiece) {
+							case Queen:
+							case Bishop when isDiagonalOffset:
+							case Rook when !isDiagonalOffset:
+							case King when fileDistance <= 1 && rankDistance <= 1:
+							case Pawn when fileDistance == 1
+							               && testSquare.Rank == friendlySquare.Rank + friendlyForward:
 								return true;
-							}
-
-							break;
 						}
-
-						testSquare = new Square(testSquare, fileOffset, rankOffset);
+						
+						// stop checking this diagonal in the case of enemy knight
+						break;
 					}
+
+					testSquare += offset;
 				}
-
-			return false;
-		}
-
-		private static bool IsCheckedKnightDirections(Board board, King king) {
-			for (int fileOffset = -2; fileOffset <= 2; fileOffset++) {
-				if (fileOffset == 0) continue;
-
-				int[] knightRankOffset = Math.Abs(fileOffset) == 2 ? new[] {-1, 1} : new[] {-2, 2};
-				foreach (int rankOffset in knightRankOffset) {
-					Square testSquare = new Square(king.Position, fileOffset, rankOffset);
-
-					if (testSquare.IsValid && board.IsOccupiedBySide(testSquare, king.OwningSide.Complement()) && board[testSquare] is Knight)
-						return true;
+			}
+			
+			foreach (Square offset in knightOffsets) {
+				Square testSquare = friendlyPiece.Position + offset;
+				
+				if (testSquare.IsValid()
+				    && board[testSquare] is Knight knight
+				    && knight.OwningSide == enemySide
+				) {
+					return true;
 				}
 			}
 
 			return false;
-		}
-
-		private static void GenerateSquareLists(List<Square> surroundingSquares, List<Square> pawnAttackingSquares, King king) {
-			foreach (int fileOffset in new[] {-1, 0, 1}) {
-				foreach (int rankOffset in new[] {-1, 0, 1}) {
-					if (fileOffset == 0 && rankOffset == 0) continue;
-
-					Square testSquare = new Square(king.Position, fileOffset, rankOffset);
-
-					if (testSquare.IsValid) {
-						if ((fileOffset == 1 || fileOffset == -1) && rankOffset == (king.OwningSide == Side.White ? 1 : -1))
-							pawnAttackingSquares.Add(testSquare);
-						surroundingSquares.Add(testSquare);
-					}
-				}
-			}
 		}
 	}
 }

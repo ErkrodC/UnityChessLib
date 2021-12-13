@@ -14,7 +14,7 @@
 					Square testSquare = new Square(Position, fileOffset, rankOffset);
 					Movement testMove = new Movement(Position, testSquare);
 
-					while (testSquare.IsValid) {
+					while (testSquare.IsValid()) {
 						Square enemyKingPosition = OwningSide == Side.White ? board.BlackKing.Position : board.WhiteKing.Position;
 						if (board.IsOccupied(testSquare)) {
 							if (!board.IsOccupiedBySide(testSquare, OwningSide) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)

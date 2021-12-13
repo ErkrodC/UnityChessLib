@@ -4,7 +4,6 @@
 		public static readonly Square Invalid = new Square(-1, -1);
 		public readonly int File;
 		public readonly int Rank;
-		internal bool IsValid => 1 <= File && File <= 8 && 1 <= Rank && Rank <= 8;
 
 		/// <summary>Creates a new Square instance.</summary>
 		/// <param name="file">Column of the square.</param>
@@ -24,11 +23,15 @@
 			File = startPosition.File + fileOffset;
 			Rank = startPosition.Rank + rankOffset;
 		}
-
-		//public static int FileRankAsIndex(int file, int rank) => (rank + 1) * 10 + file;
+		
+		internal bool IsValid() {
+			return File is >= 1 and <= 8
+			       && Rank is >= 1 and <= 8;
+		}
 
 		public static bool operator ==(Square lhs, Square rhs) => lhs.File == rhs.File && lhs.Rank == rhs.Rank;
 		public static bool operator !=(Square lhs, Square rhs) => !(lhs == rhs);
+		public static Square operator +(Square lhs, Square rhs) => new Square(lhs.File + rhs.File, lhs.Rank + rhs.Rank);
 		
 		public bool Equals(Square other) => File == other.File && Rank == other.Rank;
 

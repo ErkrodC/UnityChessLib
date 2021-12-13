@@ -36,7 +36,7 @@
 				Movement testMove = new Movement(Position, testSquare);
 
 				Square enemyKingPosition = OwningSide == Side.White ? board.BlackKing.Position : board.WhiteKing.Position;
-				if (testSquare.IsValid && board.IsOccupiedBySide(testSquare, OwningSide.Complement()) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition) {
+				if (testSquare.IsValid() && board.IsOccupiedBySide(testSquare, OwningSide.Complement()) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition) {
 					bool pawnAtSecondToLastRank = Position.Rank == (OwningSide == Side.White ? 7 : 2);
 					Movement move = pawnAtSecondToLastRank ? new PromotionMove(Position, testSquare) : new Movement(testMove);
 					LegalMoves.Add(move);
@@ -49,7 +49,7 @@
 				foreach (int fileOffset in new[] {-1, 1}) {
 					Square lateralSquare = new Square(Position, fileOffset, 0);
 
-					if (lateralSquare.IsValid && board[lateralSquare] is Pawn enemyLateralPawn && enemyLateralPawn.OwningSide != OwningSide) {
+					if (lateralSquare.IsValid() && board[lateralSquare] is Pawn enemyLateralPawn && enemyLateralPawn.OwningSide != OwningSide) {
 						Square squareToCheckWithEligibleSquare = new Square(enemyLateralPawn.Position, 0, enemyLateralPawn.OwningSide == Side.White ? -1 : 1);
 						if (squareToCheckWithEligibleSquare.Equals(enPassantEligibleSquare)) {
 							EnPassantMove testMove = new EnPassantMove(Position, enPassantEligibleSquare, enemyLateralPawn);

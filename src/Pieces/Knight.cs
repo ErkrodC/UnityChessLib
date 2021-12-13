@@ -19,7 +19,7 @@ namespace UnityChess {
 					Movement testMove = new Movement(Position, testSquare);
 
 					Square enemyKingPosition = OwningSide == Side.White ? board.BlackKing.Position : board.WhiteKing.Position;
-					if (testSquare.IsValid && !board.IsOccupiedBySide(testSquare, OwningSide) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)
+					if (testSquare.IsValid() && !board.IsOccupiedBySide(testSquare, OwningSide) && Rules.MoveObeysRules(board, testMove, OwningSide) && testSquare != enemyKingPosition)
 						LegalMoves.Add(new Movement(testMove));
 				}
 			}

@@ -10,7 +10,7 @@ namespace UnityChess {
 				$"{CalculateBoardString(game.BoardTimeline.Current)}"
 				+ $" {(currentConditions.WhiteToMove ? "w" : "b")}"
 				+ $" {CalculateCastlingInfoString(currentConditions)}"
-				+ $" {(currentEnPassantSquare.IsValid ? SquareUtil.SquareToString(currentEnPassantSquare) : "-")}"
+				+ $" {(currentEnPassantSquare.IsValid() ? SquareUtil.SquareToString(currentEnPassantSquare) : "-")}"
 				+ $" {currentConditions.HalfMoveClock}"
 				+ $" {currentConditions.TurnNumber}";
 		}

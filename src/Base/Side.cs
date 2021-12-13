@@ -7,5 +7,6 @@
 
 	public static class SideMethods {
 		public static Side Complement(this Side side) => side == Side.White ? Side.Black : Side.White;
+		public static int ForwardDirection(this Side side) => side == Side.White ? 1 : -1;
 	}
 }
