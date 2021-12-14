@@ -13,8 +13,7 @@ namespace UnityChess {
 
 		/// <summary>Creates a Game instance of a given mode with a standard starting Board.</summary>
 		/// <param name="mode">Describes which players are human or AI.</param>
-		/// <param name="startingConditions">Conditions at the time the board was set up.</param>
-		public Game(Mode mode, GameConditions startingConditions) : this(mode, startingConditions, Board.GetStartingPositionPieces()) { }
+		public Game(Mode mode) : this(mode, GameConditions.NormalStartingConditions, Board.GetStartingPositionPieces()) { }
 
 		public Game(Mode mode, GameConditions startingConditions, params Piece[] pieces) {
 			Mode = mode;
