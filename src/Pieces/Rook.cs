@@ -1,30 +1,40 @@
-﻿namespace UnityChess {
+﻿using System.Collections.Generic;
+
+namespace UnityChess {
 	public class Rook : Piece<Rook> {
 		public Rook() : base(Square.Invalid, Side.None) {}
 		public Rook(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 
-		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
-			CheckCardinalDirections(board);
-		}
+		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
+			Board board,
+			GameConditions gameConditions,
+			Square position
+		) {
+			Dictionary<(Square, Square), Movement> result = null;
 
-		private void CheckCardinalDirections(Board board) {
 			foreach (Square offset in SquareUtil.CardinalOffsets) {
-				Square testSquare = Position + offset;
+				Square endSquare = position + offset;
 
-				while (testSquare.IsValid()) {
-					Movement testMove = new Movement(Position, testSquare);
+				while (endSquare.IsValid()) {
+					Movement testMove = new Movement(position, endSquare);
 
 					if (Rules.MoveObeysRules(board, testMove, Owner)) {
-						LegalMoves.Add(new Movement(testMove));
+						if (result == null) {
+							result = new Dictionary<(Square, Square), Movement>();
+						}
+
+						result[(testMove.Start, testMove.End)] = new Movement(testMove);
 					}
 					
-					if (board.IsOccupiedAt(testSquare)) {
+					if (board.IsOccupiedAt(endSquare)) {
 						break;
 					}
 
-					testSquare += offset;
+					endSquare += offset;
 				}
 			}
+
+			return result;
 		}
 	}
 }

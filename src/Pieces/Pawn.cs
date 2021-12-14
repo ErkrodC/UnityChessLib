@@ -1,63 +1,96 @@
-﻿namespace UnityChess {
+﻿using System.Collections.Generic;
+
+namespace UnityChess {
 	public class Pawn : Piece<Pawn> {
 		private static readonly int[] adjacentFileOffsets = {-1, 1};
 		
 		public Pawn() : base(Square.Invalid, Side.None) {}
 		public Pawn(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 
-		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
-			CheckForwardMovingSquares(board);
-			CheckAttackingSquares(board);
-			CheckEnPassantCaptures(board, gameConditions.EnPassantSquare);
+		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
+			Board board,
+			GameConditions gameConditions,
+			Square position
+		) {
+			Dictionary<(Square, Square), Movement> result = null;
+			
+			CheckForwardMovingSquares(board, position, ref result);
+			CheckAttackingSquares(board, position, ref result);
+			CheckEnPassantCaptures(board, position, gameConditions.EnPassantSquare, ref result);
+
+			return result;
 		}
 
-		private void CheckForwardMovingSquares(Board board) {
+		private void CheckForwardMovingSquares(
+			Board board,
+			Square position,
+			ref Dictionary<(Square, Square), Movement> movesByStartEndSquares
+		) {
 			int forwardDirection = Owner.ForwardDirection();
-			Square testSquare = new Square(Position, 0, forwardDirection);
-			Movement testMove = new Movement(Position, testSquare);
+			Square endSquare = new Square(position, 0, forwardDirection);
+			Movement testMove = new Movement(position, endSquare);
 			
-			if (!board.IsOccupiedAt(testSquare)
+			if (!board.IsOccupiedAt(endSquare)
 			    && Rules.MoveObeysRules(board, testMove, Owner)
 			) {
-				LegalMoves.Add(
-					Position.Rank == Owner.Complement().PawnRank()
-						? new PromotionMove(Position, testSquare)
-						: new Movement(testMove)
-				);
+				if (movesByStartEndSquares == null) {
+					movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
+				}
+
+				bool amOnEnemyPawnRank = position.Rank == Owner.Complement().PawnRank();
+				movesByStartEndSquares[(position, endSquare)] = amOnEnemyPawnRank
+					? new PromotionMove(position, endSquare)
+					: new Movement(position, endSquare);
 			}
 			
-			if (Position.Rank == Owner.PawnRank()) {
-				testSquare += new Square(0, forwardDirection);
-				testMove = new Movement(Position, testSquare);
-				if (!board.IsOccupiedAt(testSquare)
+			if (position.Rank == Owner.PawnRank()) {
+				endSquare += new Square(0, forwardDirection);
+				testMove = new Movement(position, endSquare);
+				if (!board.IsOccupiedAt(endSquare)
 				    && Rules.MoveObeysRules(board, testMove, Owner)
 				) {
-					LegalMoves.Add(new Movement(testMove));
+					if (movesByStartEndSquares == null) {
+						movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
+					}
+
+					movesByStartEndSquares[(testMove.Start, testMove.End)] = new Movement(testMove);
 				}
 			}
 		}
 
-		private void CheckAttackingSquares(Board board) {
+		private void CheckAttackingSquares(
+			Board board,
+			Square position,
+			ref Dictionary<(Square, Square), Movement> movesByStartEndSquares
+		) {
 			foreach (int fileOffset in adjacentFileOffsets) {
-				Square testSquare = Position + new Square(fileOffset, Owner.ForwardDirection());
-				Movement testMove = new Movement(Position, testSquare);
+				Square endSquare = position + new Square(fileOffset, Owner.ForwardDirection());
+				Movement testMove = new Movement(position, endSquare);
 
-				if (testSquare.IsValid()
-					&& board.IsOccupiedBySideAt(testSquare, Owner.Complement())
+				if (endSquare.IsValid()
+					&& board.IsOccupiedBySideAt(endSquare, Owner.Complement())
 				    && Rules.MoveObeysRules(board, testMove, Owner)
 				) {
-					LegalMoves.Add(
-						Position.Rank == Owner.Complement().PawnRank()
-							? new PromotionMove(Position, testSquare)
-							: new Movement(testMove)
-					);
+					if (movesByStartEndSquares == null) {
+						movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
+					}
+
+					bool amOnEnemyPawnRank = position.Rank == Owner.Complement().PawnRank();
+					movesByStartEndSquares[(testMove.Start, testMove.End)] = amOnEnemyPawnRank
+						? new PromotionMove(position, endSquare)
+						: new Movement(testMove);
 				}
 			}
 		}
 
-		private void CheckEnPassantCaptures(Board board, Square enPassantEligibleSquare) {
+		private void CheckEnPassantCaptures(
+			Board board,
+			Square position,
+			Square enPassantEligibleSquare,
+			ref Dictionary<(Square, Square), Movement> movesByStartEndSquares
+		) {
 			int enPassantCaptureRank = Owner == Side.White ? 5 : 4;
-			if (Position.Rank != enPassantCaptureRank) {
+			if (position.Rank != enPassantCaptureRank) {
 				return;
 			}
 
@@ -65,9 +98,17 @@
 			if (lateralSquare.IsValid()
 			    && board[lateralSquare] is Pawn enemyPawn
 			    && enemyPawn.Owner != Owner
-			    && Rules.MoveObeysRules(board, new EnPassantMove(Position, enPassantEligibleSquare, enemyPawn), Owner)
+			    && Rules.MoveObeysRules(board, new EnPassantMove(position, enPassantEligibleSquare, enemyPawn), Owner)
 			) {
-				LegalMoves.Add(new EnPassantMove(Position, enPassantEligibleSquare, enemyPawn));
+				if (movesByStartEndSquares == null) {
+					movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
+				}
+
+				movesByStartEndSquares[(position, enPassantEligibleSquare)] = new EnPassantMove(
+					position,
+					enPassantEligibleSquare,
+					enemyPawn
+				);
 			}
 		}
 	}

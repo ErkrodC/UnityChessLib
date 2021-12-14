@@ -1,20 +1,30 @@
-﻿namespace UnityChess {
+﻿using System.Collections.Generic;
+
+namespace UnityChess {
 	public class Knight : Piece<Knight> {
 		public Knight() : base(Square.Invalid, Side.None) {}
 		public Knight(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 
-		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
-			CheckKnightSquares(board);
-		}
-
-		private void CheckKnightSquares(Board board) {
+		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
+			Board board,
+			GameConditions gameConditions,
+			Square position
+		) {
+			Dictionary<(Square, Square), Movement> result = null;
+			
 			foreach (Square offset in SquareUtil.KnightOffsets) {
-				Movement testMove = new Movement(Position, Position + offset);
+				Movement testMove = new Movement(position, position + offset);
 
 				if (Rules.MoveObeysRules(board, testMove, Owner)) {
-					LegalMoves.Add(new Movement(testMove));
+					if (result == null) {
+						result = new Dictionary<(Square, Square), Movement>();
+					}
+					
+					result[(testMove.Start, testMove.End)] = new Movement(testMove);
 				}
 			}
+
+			return result;
 		}
 	}
 }

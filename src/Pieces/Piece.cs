@@ -1,19 +1,23 @@
-﻿namespace UnityChess {
+﻿using System.Collections.Generic;
+
+namespace UnityChess {
 	/// <summary>Base class for any chess piece.</summary>
 	public abstract class Piece {
 		public Side Owner { get; protected set; }
-		public LegalMovesList LegalMoves { get; protected set; }
 		public Square Position { get; protected internal set; }
 		
 		protected Piece(Square startPosition, Side owner) {
 			Owner = owner;
 			Position = startPosition;
-			LegalMoves = new LegalMovesList();
 		}
 
 		public abstract Piece DeepCopy();
 
-		public abstract void UpdateLegalMoves(Board board, GameConditions gameConditions);
+		public abstract Dictionary<(Square, Square), Movement> CalculateLegalMoves(
+			Board board,
+			GameConditions gameConditions,
+			Square position
+		);
 		
 		public override string ToString() => $"{Owner} {GetType().Name}";
 	}
@@ -24,8 +28,7 @@
 		public override Piece DeepCopy() {
 			return new T {
 				Owner = Owner,
-				Position = Position,
-				LegalMoves = LegalMoves.DeepCopy()
+				Position = Position
 			};
 		}
 	}

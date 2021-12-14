@@ -1,25 +1,11 @@
 ﻿using System;
 
 namespace UnityChess {
-	/// <summary>An 8x8 column-major matrix representation of a chessboard.</summary>
+	/// <summary>An 8x8 matrix representation of a chessboard.</summary>
 	public class Board {
-		public King WhiteKing {
-			get {
-				if (whiteKing == null) { InitKings(); }
-
-				return whiteKing;
-			}
-		} private King whiteKing;
-
-		public King BlackKing {
-			get {
-				if (blackKing == null) { InitKings(); }
-
-				return blackKing;
-			}
-		} private King blackKing;
-
 		private readonly Piece[,] boardMatrix;
+		private King whiteKing;
+		private King blackKing;
 		
 		public Piece this[Square position] {
 			get {
@@ -39,9 +25,12 @@ namespace UnityChess {
 		}
 
 		/// <summary>Creates a Board with initial chess game position.</summary>
-		public Board() {
+		public Board(params Piece[] pieces) {
 			boardMatrix = new Piece[8, 8];
-			SetStartingPosition();
+			
+			foreach (Piece piece in pieces) {
+				this[piece.Position] = piece;
+			}
 		}
 
 		/// <summary>Creates a deep copy of the passed Board.</summary>
@@ -72,43 +61,56 @@ namespace UnityChess {
 			blackKing = null;
 		}
 
-		public void SetStartingPosition() {
-			ClearBoard();
+		private static Piece[] startingPositionPieces;
+		public static Piece[] GetStartingPositionPieces() {
+			if (startingPositionPieces == null) {
+				startingPositionPieces = new Piece[32];
 
-			//Row 2/Rank 7 and Row 7/Rank 2, both rows of pawns
-			for (int file = 1; file <= 8; file++)
-				foreach (int rank in new[] {2, 7}) {
-					Square position = new Square(file, rank);
-					Side pawnColor = rank == 2 ? Side.White : Side.Black;
-					this[position] = new Pawn(position, pawnColor);
-				}
+				int filled = 0;
 
-			//Rows 1 & 8/Ranks 8 & 1, back rows for both players
-			for (int file = 1; file <= 8; file++)
-				foreach (int rank in new[] {1, 8}) {
-					Square position = new Square(file, rank);
-					Side pieceColor = rank == 1 ? Side.White : Side.Black;
-					switch (file) {
-						case 1:
-						case 8:
-							this[position] = new Rook(position, pieceColor);
-							break;
-						case 2:
-						case 7:
-							this[position] = new Knight(position, pieceColor);
-							break;
-						case 3:
-						case 6:
-							this[position] = new Bishop(position, pieceColor);
-							break;
-						case 4:
-							this[position] = new Queen(position, pieceColor);
-							break;
-						case 5:
-							this[position] = new King(position, pieceColor);
-							break;
+				//Row 2/Rank 7 and Row 7/Rank 2, both rows of pawns
+				for (int file = 1; file <= 8; file++) {
+					foreach (int rank in new[] { 2, 7 }) {
+						Square position = new Square(file, rank);
+						Side pawnColor = rank == 2
+							? Side.White
+							: Side.Black;
+						startingPositionPieces[filled++] = new Pawn(position, pawnColor);
 					}
 				}
+
+				//Rows 1 & 8/Ranks 8 & 1, back rows for both players
+				for (int file = 1; file <= 8; file++) {
+					foreach (int rank in new[] { 1, 8 }) {
+						Square position = new Square(file, rank);
+						Side pieceColor = rank == 1
+							? Side.White
+							: Side.Black;
+						switch (file) {
+							case 1:
+							case 8:
+								startingPositionPieces[filled++] = new Rook(position, pieceColor);
+								break;
+							case 2:
+							case 7:
+								startingPositionPieces[filled++] = new Knight(position, pieceColor);
+								break;
+							case 3:
+							case 6:
+								startingPositionPieces[filled++] = new Bishop(position, pieceColor);
+								break;
+							case 4:
+								startingPositionPieces[filled++] = new Queen(position, pieceColor);
+								break;
+							case 5:
+								startingPositionPieces[filled++] = new King(position, pieceColor);
+								break;
+						}
+					}
+				}
+			}
+
+			return startingPositionPieces;
 		}
 
 		public void MovePiece(Movement move) {
@@ -126,18 +128,26 @@ namespace UnityChess {
 
 		internal bool IsOccupiedBySideAt(Square position, Side side) => this[position] is Piece piece && piece.Owner == side;
 
-		private void InitKings() {
-			for (int file = 1; file <= 8; file++) {
-				for (int rank = 1; rank <= 8; rank++) {
-					if (this[file, rank] is King king) {
-						if (king.Owner == Side.White) {
-							whiteKing = king;
-						} else {
-							blackKing = king;
+		public King GetKing(Side player) {
+			if (whiteKing == null || blackKing == null) {
+				for (int file = 1; file <= 8; file++) {
+					for (int rank = 1; rank <= 8; rank++) {
+						if (this[file, rank] is King king) {
+							if (king.Owner == Side.White) {
+								whiteKing = king;
+							} else {
+								blackKing = king;
+							}
 						}
 					}
 				}
 			}
+
+			return player switch {
+				Side.White => whiteKing,
+				Side.Black => blackKing,
+				_ => null
+			};
 		}
 
 		public string ToASCIIArt() {

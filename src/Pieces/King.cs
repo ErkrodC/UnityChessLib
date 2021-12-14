@@ -1,39 +1,67 @@
-﻿namespace UnityChess {
+﻿using System.Collections.Generic;
+
+namespace UnityChess {
 	public class King : Piece<King> {
 		private static readonly int[] rookFiles = { 1, 8 };
 		
 		public King() : base(Square.Invalid, Side.None) {}
 		public King(Square startingPosition, Side owner) : base(startingPosition, owner) {}
 
-		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
-			CheckSurroundingSquares(board);
+		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
+			Board board,
+			GameConditions gameConditions,
+			Square position
+		) {
+			Dictionary<(Square, Square), Movement> result = null;
+
+			CheckSurroundingSquares(board, position, ref result);
 
 			if (Owner == Side.White) {
 				CheckCastlingMoves(
 					board,
+					position,
 					gameConditions.WhiteCanCastleKingside,
-					gameConditions.WhiteCanCastleQueenside
+					gameConditions.WhiteCanCastleQueenside,
+					ref result
 				);
 			} else {
 				CheckCastlingMoves(
 					board,
+					position,
 					gameConditions.BlackCanCastleKingside,
-					gameConditions.BlackCanCastleQueenside
+					gameConditions.BlackCanCastleQueenside,
+					ref result
 				);
 			}
+
+			return result;
 		}
 
-		private void CheckSurroundingSquares(Board board) {
+		private void CheckSurroundingSquares(
+			Board board,
+			Square position,
+			ref Dictionary<(Square, Square), Movement> movesByStartEndSquare
+		) {
 			foreach (Square offset in SquareUtil.SurroundingOffsets) {
-				Movement testMove = new Movement(Position, Position + offset);
+				Movement testMove = new Movement(position, position + offset);
 
 				if (Rules.MoveObeysRules(board, testMove, Owner)) {
-					LegalMoves.Add(new Movement(testMove));
+					if (movesByStartEndSquare == null) {
+						movesByStartEndSquare = new Dictionary<(Square, Square), Movement>();
+					}
+					
+					movesByStartEndSquare[(testMove.Start, testMove.End)] = new Movement(testMove);
 				}
 			}
 		}
 
-		private void CheckCastlingMoves(Board board, bool canCastleKingSide, bool canCastleQueenside) {
+		private void CheckCastlingMoves(
+			Board board,
+			Square position,
+			bool canCastleKingSide,
+			bool canCastleQueenside,
+			ref Dictionary<(Square, Square), Movement> movesByStartEndSquare
+		) {
 			if (Rules.IsPlayerInCheck(board, Owner)
 				|| !canCastleKingSide && !canCastleQueenside
 			) { return; }
@@ -54,16 +82,21 @@
 				Square inBetweenSquare0 = new Square(checkingQueenside ? 4 : 6, castlingRank);
 				Square inBetweenSquare1 = new Square(checkingQueenside ? 3 : 7, castlingRank);
 				Square inBetweenSquare2 = new Square(2, castlingRank);
-				Movement inBetweenMove0 = new Movement(Position, inBetweenSquare0);
-				Movement inBetweenMove1 = new Movement(Position, inBetweenSquare1);
+				Movement castlingMove = new CastlingMove(position, inBetweenSquare1, rook);
 				
 				if (!board.IsOccupiedAt(inBetweenSquare0)
 				    && !board.IsOccupiedAt(inBetweenSquare1)
 				    && (!board.IsOccupiedAt(inBetweenSquare2) || !checkingQueenside)
-				    && Rules.MoveObeysRules(board, inBetweenMove0, Owner)
-				    && Rules.MoveObeysRules(board, inBetweenMove1, Owner)
+				    && !Rules.IsSquareAttacked(inBetweenSquare0, board, Owner)
+				    && !Rules.IsSquareAttacked(inBetweenSquare1, board, Owner)
+				    && Rules.MoveObeysRules(board, castlingMove, Owner)
 				) {
-					LegalMoves.Add(new CastlingMove(Position, inBetweenSquare1, rook));
+					if (movesByStartEndSquare == null) {
+						movesByStartEndSquare = new Dictionary<(Square, Square), Movement>();
+					}
+
+					movesByStartEndSquare[(position, inBetweenSquare1)]
+						= new CastlingMove(position, inBetweenSquare1, rook);
 				}
 			}
 		}

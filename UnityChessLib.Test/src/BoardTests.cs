@@ -9,8 +9,8 @@ namespace UnityChess.Test {
 
 		[SetUp]
 		public void Init() {
-			board = new Board();
-			pawn = board[1, 2] as Pawn;
+			pawn = new Pawn(new Square(1, 2), Side.White);
+			board = new Board(pawn);
 		}
 
 		[Test]

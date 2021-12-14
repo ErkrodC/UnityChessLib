@@ -4,22 +4,14 @@ using System.Collections.Generic;
 namespace UnityChess.Test {
 	[TestFixture]
 	public class RulesTests {
-		private Board board;
-
 		//sets up a chess position to test
-		public delegate void PositionInitializer(Board board, Side side);
-
-		[SetUp]
-		public void Init() {
-			board = new Board();
-			board.ClearBoard();
-		}
+		public delegate Board PositionInitializer(Side side);
 
 		[Test]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckCases))]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckmateCases))]
 		public void IsPlayerInCheck_PositionsWithCheck_ReturnsTrue(PositionInitializer arrange, Side side) {
-			arrange(board, side);
+			Board board = arrange(side);
 
 			bool actual = Rules.IsPlayerInCheck(board, side);
 
@@ -31,7 +23,7 @@ namespace UnityChess.Test {
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.NoneCases))]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithStalemateCases))]
 		public void IsPlayerInCheck_PositionsWithoutCheck_ReturnsFalse(PositionInitializer arrange, Side side) {
-			arrange(board, side);
+			Board board = arrange(side);
 
 			bool actual = Rules.IsPlayerInCheck(board, side);
 
@@ -42,9 +34,11 @@ namespace UnityChess.Test {
 		[Test]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithStalemateCases))]
 		public void IsPlayerStalemated_StalematedPosition_ReturnsTrue(PositionInitializer arrange, Side side) {
-			arrange(board, side);
+			Board board = arrange(side);
 
-			bool actual = Rules.IsPlayerStalemated(board, side);
+			int numLegalMoves
+				= Game.GetNumLegalMoves(Game.CalculateLegalMovesForPosition(board, dummyConditionsBySide[side]));
+			bool actual = Rules.IsPlayerStalemated(board, side, numLegalMoves);
 
 			Assert.AreEqual(true, actual, arrange.Method.Name);
 			Assert.Pass(arrange.Method.Name);
@@ -55,9 +49,11 @@ namespace UnityChess.Test {
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckCases))]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckmateCases))]
 		public void IsPlayerStalemated_NonStalematedPosition_ReturnsFalse(PositionInitializer arrange, Side side) {
-			arrange(board, side);
+			Board board = arrange(side);
 
-			bool actual = Rules.IsPlayerStalemated(board, side);
+			int numLegalMoves
+				= Game.GetNumLegalMoves(Game.CalculateLegalMovesForPosition(board, dummyConditionsBySide[side]));
+			bool actual = Rules.IsPlayerStalemated(board, side, numLegalMoves);
 
 			Assert.AreEqual(false, actual, arrange.Method.Name);
 			Assert.Pass(arrange.Method.Name);
@@ -66,9 +62,11 @@ namespace UnityChess.Test {
 		[Test]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckmateCases))]
 		public void IsPlayerCheckmated_CheckmatedPosition_ReturnsTrue(PositionInitializer arrange, Side side) {
-			arrange(board, side);
+			Board board = arrange(side);
 
-			bool actual = Rules.IsPlayerCheckmated(board, side);
+			int numLegalMoves
+				= Game.GetNumLegalMoves(Game.CalculateLegalMovesForPosition(board, dummyConditionsBySide[side]));
+			bool actual = Rules.IsPlayerCheckmated(board, side, numLegalMoves);
 
 			Assert.AreEqual(true, actual, arrange.Method.Name);
 			Assert.Pass(arrange.Method.Name);
@@ -79,9 +77,11 @@ namespace UnityChess.Test {
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckCases))]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithStalemateCases))]
 		public void IsPlayerCheckmated_NonCheckmatedPosition_ReturnsFalse(PositionInitializer arrange, Side side) {
-			arrange(board, side);
+			Board board = arrange(side);
 
-			bool actual = Rules.IsPlayerCheckmated(board, side);
+			int numLegalMoves
+				= Game.GetNumLegalMoves(Game.CalculateLegalMovesForPosition(board, dummyConditionsBySide[side]));
+			bool actual = Rules.IsPlayerCheckmated(board, side, numLegalMoves);
 
 			Assert.AreEqual(false, actual, arrange.Method.Name);
 			Assert.Pass(arrange.Method.Name);
@@ -133,65 +133,51 @@ namespace UnityChess.Test {
 		};
 		
 		private static class RulesTestData {
-			private static void StartingPositionNone(Board board, Side side) {
-				board.SetStartingPosition();
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board StartingPositionNone(Side side) {
+				return new Board(Board.GetStartingPositionPieces());
 			}
 
-			private static void BishopPinRookNone(Board board, Side side) {
-				King pinnedKing = new King(new Square(4, 4), side);
-				Rook pinnedRook = new Rook(new Square(5, 5), side);
-				King pinningKing = new King(new Square(8, 1), side.Complement());
-				Bishop pinningBishop = new Bishop(new Square(6, 6), side.Complement());
-
-				PlacePieces(board, pinnedKing, pinnedRook, pinningKing, pinningBishop);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board BishopPinRookNone(Side side) {
+				return new Board(
+					new King(new Square(4, 4), side),
+					new Rook(new Square(5, 5), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Bishop(new Square(6, 6), side.Complement())
+				);
 			}
 
-			private static void RookPinBishopNone(Board board, Side side) {
-				King pinnedKing = new King(new Square(4, 4), side);
-				Bishop pinnedBishop = new Bishop(new Square(4, 5), side);
-				King pinningKing = new King(new Square(8, 1), side.Complement());
-				Rook pinningRook = new Rook(new Square(4, 6), side.Complement());
-				
-				PlacePieces(board, pinnedKing, pinnedBishop, pinningKing, pinningRook);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board RookPinBishopNone(Side side) {
+				return new Board(
+					new King(new Square(4, 4), side),
+					new Bishop(new Square(4, 5), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Rook(new Square(4, 6), side.Complement())
+				);
 			}
 
-			private static void NeutralKnightNone(Board board, Side side) {
-				King defensiveKing = new King(new Square(4, 4), side);
-				King offensiveKing = new King(new Square(8, 1), side.Complement());
-				Knight offensiveKnight = new Knight(new Square(6, 4), side.Complement());
-
-				PlacePieces(board, defensiveKing, offensiveKing, offensiveKnight);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board NeutralKnightNone(Side side) {
+				return new Board(
+					new King(new Square(4, 4), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Knight(new Square(6, 4), side.Complement())
+				);
 			}
 
-			private static void NeutralPawnsNone(Board board, Side side) {
-				King defensiveKing;
-				King offensiveKing;
-				Pawn offensivePawn1;
-				Pawn offensivePawn2;
-
-				if (side == Side.White) {
-					defensiveKing = new King(new Square(4, 4), side);
-					offensiveKing = new King(new Square(8, 1), side.Complement());
-					offensivePawn1 = new Pawn(new Square(3, 3), side.Complement());
-					offensivePawn2 = new Pawn(new Square(5, 3), side.Complement());
-				} else {
-					defensiveKing = new King(new Square(4, 4), side);
-					offensiveKing = new King(new Square(8, 1), side.Complement());
-					offensivePawn1 = new Pawn(new Square(3, 5), side.Complement());
-					offensivePawn2 = new Pawn(new Square(5, 5), side.Complement());
-				}
-
-				PlacePieces(board, defensiveKing, offensiveKing, offensivePawn1, offensivePawn2);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board NeutralPawnsNone(Side side) {
+				return side == Side.White
+					? new Board(
+						new King(new Square(4, 4), side),
+						new King(new Square(8, 1), side.Complement()),
+						new Pawn(new Square(3, 3), side.Complement()),
+						new Pawn(new Square(5, 3), side.Complement())
+					)
+					// ER TODO shouldn't this check?
+					: new Board(
+						new King(new Square(4, 4), side),
+						new King(new Square(8, 1), side.Complement()),
+						new Pawn(new Square(3, 5), side.Complement()),
+						new Pawn(new Square(5, 5), side.Complement())
+					);
 			}
 
 			private static PositionInitializer QueenCheck(Direction direction) {
@@ -223,19 +209,15 @@ namespace UnityChess.Test {
 						queenSquare = new Square(5, 3);
 						break;
 					default:
-						queenSquare = default(Square);
+						queenSquare = default;
 						break;
 				}
 
-				return (board, side) => {
-					King checkedKing = new King(new Square(4, 4), side);
-					King checkingKing = new King(new Square(8, 1), side.Complement());
-					Queen checkingQueen = new Queen(queenSquare, side.Complement());
-
-					PlacePieces(board, checkedKing, checkingKing, checkingQueen);
-
-					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
-				};
+				return side => new Board(
+					new King(new Square(4, 4), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Queen(queenSquare, side.Complement())
+				);
 			}
 
 			private static PositionInitializer RookCheck(Direction direction) {
@@ -255,19 +237,15 @@ namespace UnityChess.Test {
 						rookSquare = new Square(4, 1);
 						break;
 					default:
-						rookSquare = default(Square);
+						rookSquare = default;
 						break;
 				}
 
-				return (board, side) => {
-					King checkedKing = new King(new Square(4, 4), side);
-					King checkingKing = new King(new Square(8, 1), side.Complement());
-					Rook checkingRook = new Rook(rookSquare, side.Complement());
-
-					PlacePieces(board, checkedKing, checkingKing, checkingRook);
-
-					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
-				};
+				return side => new Board(
+					new King(new Square(4, 4), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Rook(rookSquare, side.Complement())
+				);
 			}
 
 			private static PositionInitializer BishopCheck(Direction direction) {
@@ -287,467 +265,334 @@ namespace UnityChess.Test {
 						bishopSquare = new Square(7, 1);
 						break;
 					default:
-						bishopSquare = default(Square);
+						bishopSquare = default;
 						break;
 				}
 
-				return (board, side) => {
-					King checkedKing = new King(new Square(4, 4), side);
-					King checkingKing = new King(new Square(8, 1), side.Complement());
-					Bishop checkingBishop = new Bishop(bishopSquare, side.Complement());
-					
-					PlacePieces(board, checkedKing, checkingKing, checkingBishop);
-
-					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
-				};
+				return side => new Board(
+					new King(new Square(4, 4), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Bishop(bishopSquare, side.Complement())
+				);
 			}
 
 			private static PositionInitializer KnightCheck(KnightDirection direction) {
-				Square knightSquare;
-
-				switch (direction) {
-					case KnightDirection.KingBlackKingside:
-						knightSquare = new Square(6, 5);
-						break;
-					case KnightDirection.BlackBlackKingside:
-						knightSquare = new Square(5, 6);
-						break;
-					case KnightDirection.BlackBlackQueenside:
-						knightSquare = new Square(3, 6);
-						break;
-					case KnightDirection.QueenBlackQueenside:
-						knightSquare = new Square(2, 5);
-						break;
-					case KnightDirection.QueenWhiteQueenside:
-						knightSquare = new Square(2, 3);
-						break;
-					case KnightDirection.WhiteWhiteQueenside:
-						knightSquare = new Square(3, 2);
-						break;
-					case KnightDirection.WhiteWhiteKingside:
-						knightSquare = new Square(5, 2);
-						break;
-					case KnightDirection.KingWhiteKingside:
-						knightSquare = new Square(6, 3);
-						break;
-					default:
-						knightSquare = default(Square);
-						break;
-				}
-
-				return (board, side) => {
-					King checkedKing = new King(new Square(4, 4), side);
-					King checkingKing = new King(new Square(8, 1), side.Complement());
-					Knight checkingKnight = new Knight(knightSquare, side.Complement());
-					
-					PlacePieces(board, checkedKing, checkingKing, checkingKnight);
-
-					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+				Square knightSquare = direction switch {
+					KnightDirection.KingBlackKingside => new Square(6, 5),
+					KnightDirection.BlackBlackKingside => new Square(5, 6),
+					KnightDirection.BlackBlackQueenside => new Square(3, 6),
+					KnightDirection.QueenBlackQueenside => new Square(2, 5),
+					KnightDirection.QueenWhiteQueenside => new Square(2, 3),
+					KnightDirection.WhiteWhiteQueenside => new Square(3, 2),
+					KnightDirection.WhiteWhiteKingside => new Square(5, 2),
+					KnightDirection.KingWhiteKingside => new Square(6, 3),
+					_ => default
 				};
+
+				return side => new Board(
+					new King(new Square(4, 4), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Knight(knightSquare, side.Complement())
+				);
 			}
 
 			private static PositionInitializer PawnCheck(Direction direction, Side checkedSide) {
-				Square pawnSquare;
+				Square pawnSquare = checkedSide switch {
+					Side.White => direction switch {
+						Direction.Kingside => new Square(5, 5),
+						Direction.Queenside => new Square(3, 5),
+						_ => Square.Invalid
+					},
+					Side.Black => direction switch {
+						Direction.Kingside => new Square(5, 3),
+						Direction.Queenside => new Square(3, 3),
+						_ => Square.Invalid
+					},
+					_ => Square.Invalid
+				};
 
-				if (checkedSide == Side.White) {
-					switch (direction) {
-						case Direction.Kingside:
-							pawnSquare = new Square(5, 5);
-							break;
-						case Direction.Queenside:
-							pawnSquare = new Square(3, 5);
-							break;
-						default:
-							pawnSquare = default(Square);
-							break;
-					}
-				} else {
-					switch (direction) {
-						case Direction.Kingside:
-							pawnSquare = new Square(5, 3);
-							break;
-						case Direction.Queenside:
-							pawnSquare = new Square(3, 3);
-							break;
-						default:
-							pawnSquare = default(Square);
-							break;
-					}
-				}
+				return side => new Board(
+					new King(new Square(4, 4), side),
+					new King(new Square(8, 1), side.Complement()),
+					new Pawn(pawnSquare, side.Complement())
+				);
+			}
 
-				return (board, side) => {
-					King checkedKing = new King(new Square(4, 4), side);
-					King checkingKing = new King(new Square(8, 1), side.Complement());
-					Pawn checkingPawn = new Pawn(pawnSquare, side.Complement());
-
-					PlacePieces(board, checkedKing, checkingKing, checkingPawn);
-
-					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingPawnStalemate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(6, 1), side),
+						new King(new Square(6, 3), side.Complement()),
+						new Pawn(new Square(6, 2), side.Complement())
+					),
+					Side.Black => new Board(
+						new King(new Square(6, 8), side),
+						new King(new Square(6, 6), side.Complement()),
+						new Pawn(new Square(6, 7), side.Complement())
+					),
+					_ => default
 				};
 			}
 
-			private static void KingPawnStalemate(Board board, Side side) {
-				King stalematedKing;
-				King blunderKing;
-				Pawn blunderPawn;
-
-				if (side == Side.White) {
-					stalematedKing = new King(new Square(6, 1), side);
-					blunderKing = new King(new Square(6, 3), side.Complement());
-					blunderPawn = new Pawn(new Square(6, 2), side.Complement());
-				} else {
-					stalematedKing = new King(new Square(6, 8), side);
-					blunderKing = new King(new Square(6, 6), side.Complement());
-					blunderPawn = new Pawn(new Square(6, 7), side.Complement());
-				}
-
-				PlacePieces(board, stalematedKing, blunderKing, blunderPawn);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingRookStalemate(Side side) {
+				return new Board(
+					new King(new Square(1, 1), side),
+					new King(new Square(3, 3), side.Complement()),
+					new Rook(new Square(2, 2), side.Complement())
+				);
 			}
 
-			private static void KingRookStalemate(Board board, Side side) {
-				King stalematedKing = new King(new Square(1, 1), side);
-				King blunderKing = new King(new Square(3, 3), side.Complement());
-				Rook blunderRook = new Rook(new Square(2, 2), side.Complement());
-				
-				PlacePieces(board, stalematedKing, blunderKing, blunderRook);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingBishopStalemate(Side side) {
+				return new Board(
+					new King(new Square(1, 8), side),
+					new King(new Square(1, 6), side.Complement()),
+					new Bishop(new Square(6, 4), side.Complement())
+				);
 			}
 
-			private static void KingBishopStalemate(Board board, Side side) {
-				King stalematedKing = new King(new Square(1, 8), side);
-				King blunderKing = new King(new Square(1, 6), side.Complement());
-				Bishop blunderBishop = new Bishop(new Square(6, 4), side.Complement());
-
-				PlacePieces(board, stalematedKing, blunderKing, blunderBishop);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board RookPinBishopStalemate(Side side) {
+				return new Board(
+					new King(new Square(1, 8), side),
+					new King(new Square(2, 6), side.Complement()),
+					new Rook(new Square(8, 8), side.Complement()),
+					new Bishop(new Square(2, 8), side)
+				);
 			}
 
-			private static void RookPinBishopStalemate(Board board, Side side) {
-				King stalematedKing = new King(new Square(1, 8), side);
-				King blunderKing = new King(new Square(2, 6), side.Complement());
-				Rook blunderRook = new Rook(new Square(8, 8), side.Complement());
-				Bishop stalematedBishop = new Bishop(new Square(2, 8), side);
-
-				PlacePieces(board, stalematedKing, blunderKing, blunderRook, stalematedBishop);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board QueenStalemate(Side side) {
+				return new Board(
+					new King(new Square(1, 1), side),
+					new King(new Square(8, 8), side.Complement()),
+					new Queen(new Square(2, 3), side.Complement())
+				);
 			}
 
-			private static void QueenStalemate(Board board, Side side) {
-				King stalematedKing = new King(new Square(1, 1), side);
-				King blunderKing = new King(new Square(8, 8), side.Complement());
-				Queen blunderQueen = new Queen(new Square(2, 3), side.Complement());
-
-				PlacePieces(board, stalematedKing, blunderKing, blunderQueen);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board AnandVsKramnikStalemate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(8, 5), side),
+						new Pawn(new Square(8, 4), side),
+						new King(new Square(6, 5), side.Complement()),
+						new Pawn(new Square(6, 6), side.Complement()),
+						new Pawn(new Square(7, 7), side.Complement())
+					),
+					Side.Black => new Board(
+						new King(new Square(8, 4), side),
+						new Pawn(new Square(8, 5), side),
+						new King(new Square(6, 4), side.Complement()),
+						new Pawn(new Square(6, 3), side.Complement()),
+						new Pawn(new Square(7, 2), side.Complement())
+					),
+					_ => null
+				};
 			}
 
-			private static void AnandVsKramnikStalemate(Board board, Side side) {
-				King stalematedKing;
-				Pawn stalematedPawn;
-				King blunderKing;
-				Pawn blunderPawn1;
-				Pawn blunderPawn2;
-
-				if (side == Side.White) {
-					stalematedKing = new King(new Square(8, 5), side);
-					stalematedPawn = new Pawn(new Square(8, 4), side);
-					blunderKing = new King(new Square(6, 5), side.Complement());
-					blunderPawn1 = new Pawn(new Square(6, 6), side.Complement());
-					blunderPawn2 = new Pawn(new Square(7, 7), side.Complement());
-				} else {
-					stalematedKing = new King(new Square(8, 4), side);
-					stalematedPawn = new Pawn(new Square(8, 5), side);
-					blunderKing = new King(new Square(6, 4), side.Complement());
-					blunderPawn1 = new Pawn(new Square(6, 3), side.Complement());
-					blunderPawn2 = new Pawn(new Square(7, 2), side.Complement());
-				}
-
-				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderPawn1, blunderPawn2);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KorchnoiVsKarpovStalemate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(8, 2), side),
+						new Pawn(new Square(1, 5), side),
+						new King(new Square(6, 2), side.Complement()),
+						new Bishop(new Square(7, 2), side.Complement()),
+						new Pawn(new Square(1, 6), side.Complement())
+					),
+					Side.Black => new Board(
+						new King(new Square(8, 7), side),
+						new Pawn(new Square(1, 4), side),
+						new King(new Square(6, 7), side.Complement()),
+						new Bishop(new Square(7, 7), side.Complement()),
+						new Pawn(new Square(1, 3), side.Complement())
+					),
+					_ => null
+				};
 			}
 
-			private static void KorchnoiVsKarpovStalemate(Board board, Side side) {
-				King stalematedKing;
-				Pawn stalematedPawn;
-				King blunderKing;
-				Bishop blunderBishop;
-				Pawn blunderPawn;
-
-				if (side == Side.White) {
-					stalematedKing = new King(new Square(8, 2), side);
-					stalematedPawn = new Pawn(new Square(1, 5), side);
-					blunderKing = new King(new Square(6, 2), side.Complement());
-					blunderBishop = new Bishop(new Square(7, 2), side.Complement());
-					blunderPawn = new Pawn(new Square(1, 6), side.Complement());
-				} else {
-					stalematedKing = new King(new Square(8, 7), side);
-					stalematedPawn = new Pawn(new Square(1, 4), side);
-					blunderKing = new King(new Square(6, 7), side.Complement());
-					blunderBishop = new Bishop(new Square(7, 7), side.Complement());
-					blunderPawn = new Pawn(new Square(1, 3), side.Complement());
-				}
-
-				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderBishop, blunderPawn);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board BernsteinVsSmyslovStalemate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(6, 3), side),
+						new King(new Square(6, 5), side.Complement()),
+						new Rook(new Square(2, 2), side.Complement()),
+						new Pawn(new Square(6, 4), side.Complement())
+					),
+					Side.Black => new Board(
+						new King(new Square(6, 6), side),
+						new King(new Square(6, 4), side.Complement()),
+						new Rook(new Square(2, 7), side.Complement()),
+						new Pawn(new Square(6, 5), side.Complement())
+					),
+					_ => null
+				};
 			}
 
-			private static void BernsteinVsSmyslovStalemate(Board board, Side side) {
-				King stalematedKing;
-				King blunderKing;
-				Rook blunderRook;
-				Pawn blunderPawn;
-
-				if (side == Side.White) {
-					stalematedKing = new King(new Square(6, 3), side);
-					blunderKing = new King(new Square(6, 5), side.Complement());
-					blunderRook = new Rook(new Square(2, 2), side.Complement());
-					blunderPawn = new Pawn(new Square(6, 4), side.Complement());
-				} else {
-					stalematedKing = new King(new Square(6, 6), side);
-					blunderKing = new King(new Square(6, 4), side.Complement());
-					blunderRook = new Rook(new Square(2, 7), side.Complement());
-					blunderPawn = new Pawn(new Square(6, 5), side.Complement());
-				}
-
-				PlacePieces(board, stalematedKing, blunderKing, blunderRook, blunderPawn);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board GelfandVsKramnikStalemate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(8, 2), side),
+						new Pawn(new Square(1, 3), side),
+						new Pawn(new Square(6, 3), side),
+						new Pawn(new Square(7, 2), side),
+						new Pawn(new Square(8, 3), side),
+						new King(new Square(8, 7), side.Complement()),
+						new Rook(new Square(5, 2), side.Complement()),
+						new Queen(new Square(4, 1), side.Complement()),
+						new Pawn(new Square(1, 4), side.Complement()),
+						new Pawn(new Square(4, 5), side.Complement()),
+						new Pawn(new Square(6, 4), side.Complement()),
+						new Pawn(new Square(6, 6), side.Complement()),
+						new Pawn(new Square(7, 5), side.Complement()),
+						new Pawn(new Square(8, 4), side.Complement())
+					),
+					Side.Black => new Board(
+						new King(new Square(8, 7), side),
+						new Pawn(new Square(1, 6), side),
+						new Pawn(new Square(6, 6), side),
+						new Pawn(new Square(7, 7), side),
+						new Pawn(new Square(8, 6), side),
+						new King(new Square(8, 2), side.Complement()),
+						new Rook(new Square(5, 7), side.Complement()),
+						new Queen(new Square(4, 8), side.Complement()),
+						new Pawn(new Square(1, 5), side.Complement()),
+						new Pawn(new Square(4, 4), side.Complement()),
+						new Pawn(new Square(6, 5), side.Complement()),
+						new Pawn(new Square(6, 3), side.Complement()),
+						new Pawn(new Square(7, 4), side.Complement()),
+						new Pawn(new Square(8, 5), side.Complement())
+					),
+					_ => null
+				};
 			}
 
-			private static void GelfandVsKramnikStalemate(Board board, Side side) {
-				King stalematedKing;
-				Pawn[] stalematedPawns = new Pawn[4];
-				King blunderKing;
-				Rook blunderRook;
-				Queen blunderQueen;
-				Pawn[] blunderPawns = new Pawn[6];
-
-				if (side == Side.White) {
-					stalematedKing = new King(new Square(8, 2), side);
-					stalematedPawns[0] = new Pawn(new Square(1, 3), side);
-					stalematedPawns[1] = new Pawn(new Square(6, 3), side);
-					stalematedPawns[2] = new Pawn(new Square(7, 2), side);
-					stalematedPawns[3] = new Pawn(new Square(8, 3), side);
-					blunderKing = new King(new Square(8, 7), side.Complement());
-					blunderRook = new Rook(new Square(5, 2), side.Complement());
-					blunderQueen = new Queen(new Square(4, 1), side.Complement());
-					blunderPawns[0] = new Pawn(new Square(1, 4), side.Complement());
-					blunderPawns[1] = new Pawn(new Square(4, 5), side.Complement());
-					blunderPawns[2] = new Pawn(new Square(6, 4), side.Complement());
-					blunderPawns[3] = new Pawn(new Square(6, 6), side.Complement());
-					blunderPawns[4] = new Pawn(new Square(7, 5), side.Complement());
-					blunderPawns[5] = new Pawn(new Square(8, 4), side.Complement());
-				} else {
-					stalematedKing = new King(new Square(8, 7), side);
-					stalematedPawns[0] = new Pawn(new Square(1, 6), side);
-					stalematedPawns[1] = new Pawn(new Square(6, 6), side);
-					stalematedPawns[2] = new Pawn(new Square(7, 7), side);
-					stalematedPawns[3] = new Pawn(new Square(8, 6), side);
-					blunderKing = new King(new Square(8, 2), side.Complement());
-					blunderRook = new Rook(new Square(5, 7), side.Complement());
-					blunderQueen = new Queen(new Square(4, 8), side.Complement());
-					blunderPawns[0] = new Pawn(new Square(1, 5), side.Complement());
-					blunderPawns[1] = new Pawn(new Square(4, 4), side.Complement());
-					blunderPawns[2] = new Pawn(new Square(6, 5), side.Complement());
-					blunderPawns[3] = new Pawn(new Square(6, 3), side.Complement());
-					blunderPawns[4] = new Pawn(new Square(7, 4), side.Complement());
-					blunderPawns[5] = new Pawn(new Square(8, 5), side.Complement());
-				}
-
-				PlacePieces(board, stalematedKing, blunderKing, blunderRook, blunderQueen);
-
-				foreach (Pawn stalematedPawn in stalematedPawns) {
-					PlacePieces(board, stalematedPawn);
-				}
-
-				foreach (Pawn blunderPawn in blunderPawns) {
-					PlacePieces(board, blunderPawn);
-				}
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board DoubleRookCheckmate(Side side) {
+				return new Board(
+					new King(new Square(1, 1), side),
+					new King(new Square(8, 8), side.Complement()),
+					new Rook(new Square(8, 1), side.Complement()),
+					new Rook(new Square(8, 2), side.Complement())
+				);
 			}
 
-			private static void DoubleRookCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(1, 1), side);
-				King winningKing = new King(new Square(8, 8), side.Complement());
-				Rook winningRook1 = new Rook(new Square(8, 1), side.Complement());
-				Rook winningRook2 = new Rook(new Square(8, 2), side.Complement());
-
-				
-				PlacePieces(board, checkmatedKing, winningKing, winningRook1, winningRook2);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingQueenCheckmate(Side side) {
+				return new Board(
+					new King(new Square(8, 5), side),
+					new King(new Square(6, 5), side.Complement()),
+					new Queen(new Square(7, 5), side.Complement())
+				);
 			}
 
-			private static void KingQueenCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(8, 5), side);
-				King winningKing = new King(new Square(6, 5), side.Complement());
-				Queen winningQueen = new Queen(new Square(7, 5), side.Complement());
-
-				
-				PlacePieces(board, checkmatedKing, winningKing, winningQueen);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingRookCheckmate(Side side) {
+				return new Board(
+					new King(new Square(8, 5), side),
+					new King(new Square(6, 5), side.Complement()),
+					new Rook(new Square(8, 1), side.Complement())
+				);
 			}
 
-			private static void KingRookCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(8, 5), side);
-				King winningKing = new King(new Square(6, 5), side.Complement());
-				Rook winningRook = new Rook(new Square(8, 1), side.Complement());
-
-				PlacePieces(board, checkmatedKing, winningKing, winningRook);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingDoubleBishopCheckmate(Side side) {
+				return new Board(
+					new King(new Square(8, 8), side),
+					new King(new Square(7, 6), side.Complement()),
+					new Bishop(new Square(1, 2), side.Complement()),
+					new Bishop(new Square(2, 2), side.Complement())
+				);
 			}
 
-			private static void KingDoubleBishopCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(8, 8), side);
-				King winningKing = new King(new Square(7, 6), side.Complement());
-				Bishop winningBishop1 = new Bishop(new Square(1, 2), side.Complement());
-				Bishop winningBishop2 = new Bishop(new Square(2, 2), side.Complement());
-				
-				PlacePieces(board, checkmatedKing, winningKing, winningBishop1, winningBishop2);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingBishopKnightCheckmate(Side side) {
+				return new Board(
+					new King(new Square(1, 8), side),
+					new King(new Square(2, 6), side.Complement()),
+					new Bishop(new Square(3, 6), side.Complement()),
+					new Knight(new Square(1, 6), side.Complement())
+				);
 			}
 
-			private static void KingBishopKnightCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(1, 8), side);
-				King winningKing = new King(new Square(2, 6), side.Complement());
-				Bishop winningBishop = new Bishop(new Square(3, 6), side.Complement());
-				Knight winningKnight = new Knight(new Square(1, 6), side.Complement());
-				
-				PlacePieces(board, checkmatedKing, winningKing, winningBishop, winningKnight);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingDoubleKnightCheckmate(Side side) {
+				return new Board(
+					new King(new Square(8, 8), side),
+					new King(new Square(8, 6), side.Complement()),
+					new Knight(new Square(6, 6), side.Complement()),
+					new Knight(new Square(7, 6), side.Complement())
+				);
 			}
 
-			private static void KingDoubleKnightCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(8, 8), side);
-				King winningKing = new King(new Square(8, 6), side.Complement());
-				Knight winningKnight1 = new Knight(new Square(6, 6), side.Complement());
-				Knight winningKnight2 = new Knight(new Square(7, 6), side.Complement());
-				
-				PlacePieces(board, checkmatedKing, winningKing, winningKnight1, winningKnight2);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KingDoublePawnCheckmate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(5, 1), side),
+						new King(new Square(5, 3), side.Complement()),
+						new Pawn(new Square(5, 2), side.Complement()),
+						new Pawn(new Square(4, 2), side.Complement())
+					),
+					Side.Black => new Board(
+						new King(new Square(5, 8), side),
+						new King(new Square(5, 6), side.Complement()),
+						new Pawn(new Square(5, 7), side.Complement()),
+						new Pawn(new Square(4, 7), side.Complement())
+					),
+					_ => null
+				};
 			}
 
-			private static void KingDoublePawnCheckmate(Board board, Side side) {
-				King checkmatedKing;
-				King winningKing;
-				Pawn winningPawn1;
-				Pawn winningPawn2;
-
-				if (side == Side.White) {
-					checkmatedKing = new King(new Square(5, 1), side);
-					winningKing = new King(new Square(5, 3), side.Complement());
-					winningPawn1 = new Pawn(new Square(5, 2), side.Complement());
-					winningPawn2 = new Pawn(new Square(4, 2), side.Complement());
-				} else {
-					checkmatedKing = new King(new Square(5, 8), side);
-					winningKing = new King(new Square(5, 6), side.Complement());
-					winningPawn1 = new Pawn(new Square(5, 7), side.Complement());
-					winningPawn2 = new Pawn(new Square(4, 7), side.Complement());
-				}
-
-				PlacePieces(board, checkmatedKing, winningKing, winningPawn1, winningPawn2);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board BackRankCheckmate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(7, 1), side),
+						new King(new Square(7, 8), side.Complement()),
+						new Rook(new Square(1, 1), side.Complement()),
+						new Pawn(new Square(6, 2), side),
+						new Pawn(new Square(7, 2), side),
+						new Pawn(new Square(8, 2), side)
+					),
+					Side.Black => new Board(
+						new King(new Square(7, 8), side),
+						new King(new Square(7, 1), side.Complement()),
+						new Rook(new Square(1, 8), side.Complement()),
+						new Pawn(new Square(6, 7), side),
+						new Pawn(new Square(7, 7), side),
+						new Pawn(new Square(8, 7), side)
+					),
+					_ => null
+				};
 			}
 
-			private static void BackRankCheckmate(Board board, Side side) {
-				King checkmatedKing;
-				King winningKing;
-				Rook winningRook;
-				Pawn losingPawn1;
-				Pawn losingPawn2;
-				Pawn losingPawn3;
-
-				if (side == Side.White) {
-					checkmatedKing = new King(new Square(7, 1), side);
-					winningKing = new King(new Square(7, 8), side.Complement());
-					winningRook = new Rook(new Square(1, 1), side.Complement());
-					losingPawn1 = new Pawn(new Square(6, 2), side);
-					losingPawn2 = new Pawn(new Square(7, 2), side);
-					losingPawn3 = new Pawn(new Square(8, 2), side);
-				} else {
-					checkmatedKing = new King(new Square(7, 8), side);
-					winningKing = new King(new Square(7, 1), side.Complement());
-					winningRook = new Rook(new Square(1, 8), side.Complement());
-					losingPawn1 = new Pawn(new Square(6, 7), side);
-					losingPawn2 = new Pawn(new Square(7, 7), side);
-					losingPawn3 = new Pawn(new Square(8, 7), side);
-				}
-
-				PlacePieces(board, checkmatedKing, winningKing, winningRook, losingPawn1, losingPawn2, losingPawn3);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board SmotheredCheckmate(Side side) {
+				return side switch {
+					Side.White => new Board(
+						new King(new Square(8, 1), side),
+						new King(new Square(7, 7), side.Complement()),
+						new Knight(new Square(6, 2), side.Complement()),
+						new Pawn(new Square(7, 2), side),
+						new Pawn(new Square(8, 2), side),
+						new Rook(new Square(7, 1), side)
+					),
+					Side.Black => new Board(
+						new King(new Square(8, 8), side),
+						new King(new Square(7, 2), side.Complement()),
+						new Knight(new Square(6, 7), side.Complement()),
+						new Pawn(new Square(7, 7), side),
+						new Pawn(new Square(8, 7), side),
+						new Rook(new Square(7, 8), side)
+					),
+					_ => null
+				};
 			}
 
-			private static void SmotheredCheckmate(Board board, Side side) {
-				King checkmatedKing;
-				King winningKing;
-				Knight winningKnight;
-				Pawn losingPawn1;
-				Pawn losingPawn2;
-				Rook losingRook;
-
-				if (side == Side.White) {
-					checkmatedKing = new King(new Square(8, 1), side);
-					winningKing = new King(new Square(7, 7), side.Complement());
-					winningKnight = new Knight(new Square(6, 2), side.Complement());
-					losingPawn1 = new Pawn(new Square(7, 2), side);
-					losingPawn2 = new Pawn(new Square(8, 2), side);
-					losingRook = new Rook(new Square(7, 1), side);
-				} else {
-					checkmatedKing = new King(new Square(8, 8), side);
-					winningKing = new King(new Square(7, 2), side.Complement());
-					winningKnight = new Knight(new Square(6, 7), side.Complement());
-					losingPawn1 = new Pawn(new Square(7, 7), side);
-					losingPawn2 = new Pawn(new Square(8, 7), side);
-					losingRook = new Rook(new Square(7, 8), side);
-				}
-
-				PlacePieces(board, checkmatedKing, winningKing, winningKnight, losingPawn1, losingPawn2, losingRook);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
+			private static Board KnightRookCheckmate(Side side) {
+				return new Board(
+					new King(new Square(8, 8), side),
+					new King(new Square(7, 1), side.Complement()),
+					new Knight(new Square(6, 6), side.Complement()),
+					new Rook(new Square(8, 7), side.Complement())
+				);
 			}
 
-			private static void KnightRookCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(8, 8), side);
-				King winningKing = new King(new Square(7, 1), side.Complement());
-				Knight winningKnight = new Knight(new Square(6, 6), side.Complement());
-				Rook winningRook = new Rook(new Square(8, 7), side.Complement());
-				
-				PlacePieces(board, checkmatedKing, winningKing, winningKnight, winningRook);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
-			}
-
-			private static void QueenBishopCheckmate(Board board, Side side) {
-				King checkmatedKing = new King(new Square(7, 8), side);
-				King winningKing = new King(new Square(7, 1), side.Complement());
-				Queen winningQueen = new Queen(new Square(7, 7), side.Complement());
-				Bishop winningBishop = new Bishop(new Square(8, 6), side.Complement());
-
-				PlacePieces(board, checkmatedKing, winningKing, winningQueen, winningBishop);
-
-				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
-			}
-
-			private static void PlacePieces(Board board, params Piece[] pieces) {
-				foreach (Piece piece in pieces) {
-					board[piece.Position] = piece;
-				}
+			private static Board QueenBishopCheckmate(Side side) {
+				return new Board(
+					new King(new Square(7, 8), side),
+					new King(new Square(7, 1), side.Complement()),
+					new Queen(new Square(7, 7), side.Complement()),
+					new Bishop(new Square(8, 6), side.Complement())
+				);
 			}
 
 			public static object[] NoneCases = {
