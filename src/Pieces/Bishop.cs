@@ -1,7 +1,7 @@
 ﻿namespace UnityChess {
-	public class Bishop : Piece {
+	public class Bishop : Piece<Bishop> {
+		public Bishop() : base(Square.Invalid, Side.None) {}
 		public Bishop(Square startingPosition, Side owner) : base(startingPosition, owner) {}
-		public Bishop(Bishop bishopCopy) : base(bishopCopy) {}
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckDiagonalDirections(board);

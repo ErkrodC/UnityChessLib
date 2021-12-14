@@ -1,7 +1,7 @@
 ﻿namespace UnityChess {
-	public class Queen : Piece {
+	public class Queen : Piece<Queen> {
+		public Queen() : base(Square.Invalid, Side.None) {}
 		public Queen(Square startingPosition, Side owner) : base(startingPosition, owner) {}
-		public Queen(Queen queenCopy) : base(queenCopy) {}
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckRoseDirections(board);

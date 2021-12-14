@@ -1,8 +1,8 @@
 ﻿namespace UnityChess {
-	public class Rook : Piece {
+	public class Rook : Piece<Rook> {
+		public Rook() : base(Square.Invalid, Side.None) {}
 		public Rook(Square startingPosition, Side owner) : base(startingPosition, owner) {}
-		public Rook(Rook rookCopy) : base(rookCopy) {}
-		
+
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckCardinalDirections(board);
 		}

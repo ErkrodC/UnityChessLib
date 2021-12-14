@@ -1,9 +1,9 @@
 ﻿namespace UnityChess {
-	public class King : Piece {
+	public class King : Piece<King> {
 		private static readonly int[] rookFiles = { 1, 8 };
 		
+		public King() : base(Square.Invalid, Side.None) {}
 		public King(Square startingPosition, Side owner) : base(startingPosition, owner) {}
-		public King(King kingCopy) : base(kingCopy) {}
 
 		public override void UpdateLegalMoves(Board board, GameConditions gameConditions) {
 			CheckSurroundingSquares(board);

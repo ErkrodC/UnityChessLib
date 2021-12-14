@@ -1,31 +1,32 @@
-﻿using System;
-
-namespace UnityChess {
+﻿namespace UnityChess {
 	/// <summary>Base class for any chess piece.</summary>
 	public abstract class Piece {
-		public readonly Side Owner;
-		public readonly LegalMovesList LegalMoves;
-		public Square Position;
-
+		public Side Owner { get; protected set; }
+		public LegalMovesList LegalMoves { get; protected set; }
+		public Square Position { get; protected internal set; }
+		
 		protected Piece(Square startPosition, Side owner) {
 			Owner = owner;
 			Position = startPosition;
 			LegalMoves = new LegalMovesList();
 		}
 
-		protected Piece(Piece pieceCopy) {
-			Owner = pieceCopy.Owner;
-			Position = pieceCopy.Position;
-			LegalMoves = pieceCopy.LegalMoves.DeepCopy();
-		}
+		public abstract Piece DeepCopy();
 
 		public abstract void UpdateLegalMoves(Board board, GameConditions gameConditions);
-
-		public Piece DeepCopy() {
-			Type derivedType = GetType();
-			return (Piece) derivedType.GetConstructor(new []{derivedType})?.Invoke(new object[]{this}); // copy constructor call
-		}
-
+		
 		public override string ToString() => $"{Owner} {GetType().Name}";
+	}
+
+	public abstract class Piece<T> : Piece where T : Piece<T>, new() {
+		protected Piece(Square startPosition, Side owner) : base(startPosition, owner) { }
+		
+		public override Piece DeepCopy() {
+			return new T {
+				Owner = Owner,
+				Position = Position,
+				LegalMoves = LegalMoves.DeepCopy()
+			};
+		}
 	}
 }
