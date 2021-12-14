@@ -78,7 +78,7 @@ namespace UnityChess.Test {
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.NoneCases))]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithCheckCases))]
 		[TestCaseSource(typeof(RulesTestData), nameof(RulesTestData.WithStalemateCases))]
-		public void IsPlayerCheckmated_NoncheckmatedPosition_ReturnsFalse(PositionInitializer arrange, Side side) {
+		public void IsPlayerCheckmated_NonCheckmatedPosition_ReturnsFalse(PositionInitializer arrange, Side side) {
 			arrange(board, side);
 
 			bool actual = Rules.IsPlayerCheckmated(board, side);
@@ -136,7 +136,6 @@ namespace UnityChess.Test {
 			private static void StartingPositionNone(Board board, Side side) {
 				board.SetStartingPosition();
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -148,7 +147,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, pinnedKing, pinnedRook, pinningKing, pinningBishop);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -160,7 +158,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, pinnedKing, pinnedBishop, pinningKing, pinningRook);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -171,7 +168,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, defensiveKing, offensiveKing, offensiveKnight);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -195,7 +191,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, defensiveKing, offensiveKing, offensivePawn1, offensivePawn2);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -239,7 +234,6 @@ namespace UnityChess.Test {
 
 					PlacePieces(board, checkedKing, checkingKing, checkingQueen);
 
-					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
@@ -272,7 +266,6 @@ namespace UnityChess.Test {
 
 					PlacePieces(board, checkedKing, checkingKing, checkingRook);
 
-					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
@@ -305,7 +298,6 @@ namespace UnityChess.Test {
 					
 					PlacePieces(board, checkedKing, checkingKing, checkingBishop);
 
-					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
@@ -350,7 +342,6 @@ namespace UnityChess.Test {
 					
 					PlacePieces(board, checkedKing, checkingKing, checkingKnight);
 
-					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
@@ -391,7 +382,6 @@ namespace UnityChess.Test {
 
 					PlacePieces(board, checkedKing, checkingKing, checkingPawn);
 
-					board.InitKings();
 					Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 				};
 			}
@@ -413,7 +403,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, stalematedKing, blunderKing, blunderPawn);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -424,7 +413,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -435,7 +423,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, stalematedKing, blunderKing, blunderBishop);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -447,7 +434,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook, stalematedBishop);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -458,7 +444,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, stalematedKing, blunderKing, blunderQueen);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -485,7 +470,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderPawn1, blunderPawn2);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -512,7 +496,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, stalematedKing, stalematedPawn, blunderKing, blunderBishop, blunderPawn);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -536,7 +519,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, stalematedKing, blunderKing, blunderRook, blunderPawn);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -590,7 +572,6 @@ namespace UnityChess.Test {
 					PlacePieces(board, blunderPawn);
 				}
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -603,7 +584,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, checkmatedKing, winningKing, winningRook1, winningRook2);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -615,7 +595,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, checkmatedKing, winningKing, winningQueen);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -626,7 +605,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, checkmatedKing, winningKing, winningRook);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -638,7 +616,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, checkmatedKing, winningKing, winningBishop1, winningBishop2);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -650,7 +627,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, checkmatedKing, winningKing, winningBishop, winningKnight);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -662,7 +638,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, checkmatedKing, winningKing, winningKnight1, winningKnight2);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -686,7 +661,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, checkmatedKing, winningKing, winningPawn1, winningPawn2);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -716,7 +690,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, checkmatedKing, winningKing, winningRook, losingPawn1, losingPawn2, losingPawn3);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -746,7 +719,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, checkmatedKing, winningKing, winningKnight, losingPawn1, losingPawn2, losingRook);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -758,7 +730,6 @@ namespace UnityChess.Test {
 				
 				PlacePieces(board, checkmatedKing, winningKing, winningKnight, winningRook);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 
@@ -770,7 +741,6 @@ namespace UnityChess.Test {
 
 				PlacePieces(board, checkmatedKing, winningKing, winningQueen, winningBishop);
 
-				board.InitKings();
 				Game.UpdateAllPiecesLegalMoves(board, dummyConditionsBySide[side]);
 			}
 

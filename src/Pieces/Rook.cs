@@ -13,26 +13,13 @@
 
 				while (testSquare.IsValid()) {
 					Movement testMove = new Movement(Position, testSquare);
-					
-					Square enemyKingPosition = Owner == Side.White
-						? board.BlackKing.Position
-						: board.WhiteKing.Position;
+
+					if (Rules.MoveObeysRules(board, testMove, Owner)) {
+						LegalMoves.Add(new Movement(testMove));
+					}
 					
 					if (board.IsOccupiedAt(testSquare)) {
-						if (!board.IsOccupiedBySideAt(testSquare, Owner)
-						    && Rules.MoveObeysRules(board, testMove, Owner)
-						    && testSquare != enemyKingPosition
-						) {
-							LegalMoves.Add(new Movement(testMove));
-						}
-
 						break;
-					}
-
-					if (Rules.MoveObeysRules(board, testMove, Owner)
-					    && testSquare != enemyKingPosition
-					) {
-						LegalMoves.Add(new Movement(testMove));
 					}
 
 					testSquare += offset;

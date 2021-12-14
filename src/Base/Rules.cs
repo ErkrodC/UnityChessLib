@@ -12,22 +12,17 @@ namespace UnityChess {
 		/// <summary>Checks if the player of the given side is in check.</summary>
 		public static bool IsPlayerInCheck(Board board, Side player) => IsPieceAttacked(board, player == Side.White ? board.WhiteKing : board.BlackKing);
 
-		internal static bool MoveObeysRules(Board board, Movement move, Side movedPieceSide) => !MovePutsMoverInCheck(board, move, movedPieceSide) && MoveRemovesCheckFromPlayerIfNeeded(board, move, movedPieceSide);
-
-		private static bool MoveRemovesCheckFromPlayerIfNeeded(Board board, Movement move, Side side) {
-			if (!IsPlayerInCheck(board, side)) return true;
-
+		internal static bool MoveObeysRules(Board board, Movement move, Side movedPieceSide) {
+			if (!move.Start.IsValid()
+			    || !move.End.IsValid()
+				|| board[move.End] is King
+			    || board.IsOccupiedBySideAt(move.End, movedPieceSide)
+			) { return false; }
+			
 			Board resultingBoard = new Board(board);
 			resultingBoard.MovePiece(new Movement(move.Start, move.End));
-
-			return !IsPlayerInCheck(resultingBoard, side);
-		}
-
-		private static bool MovePutsMoverInCheck(Board board, Movement move, Side moverSide) {
-			Board resultingBoard = new Board(board);
-			resultingBoard.MovePiece(new Movement(move.Start, move.End));
-
-			return IsPlayerInCheck(resultingBoard, moverSide);
+			
+			return !IsPlayerInCheck(resultingBoard, movedPieceSide);
 		}
 
 		private static bool PlayerHasNoLegalMoves(Side player, Board board) {
@@ -36,7 +31,9 @@ namespace UnityChess {
 			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					Piece piece = board[file, rank];
-					if (piece != null && piece.Owner == player) sumOfLegalMoves += piece.LegalMoves.Count;;
+					if (piece != null && piece.Owner == player) {
+						sumOfLegalMoves += piece.LegalMoves.Count;
+					}
 				}
 			}
 

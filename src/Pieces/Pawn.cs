@@ -42,14 +42,9 @@
 				Square testSquare = Position + new Square(fileOffset, Owner.ForwardDirection());
 				Movement testMove = new Movement(Position, testSquare);
 
-				Square enemyKingPosition = Owner == Side.White
-					? board.BlackKing.Position
-					: board.WhiteKing.Position;
-				
 				if (testSquare.IsValid()
-				    && board.IsOccupiedBySideAt(testSquare, Owner.Complement())
+					&& board.IsOccupiedBySideAt(testSquare, Owner.Complement())
 				    && Rules.MoveObeysRules(board, testMove, Owner)
-				    && testSquare != enemyKingPosition
 				) {
 					LegalMoves.Add(
 						Position.Rank == Owner.Complement().PawnRank()

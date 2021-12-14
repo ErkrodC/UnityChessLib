@@ -3,8 +3,22 @@
 namespace UnityChess {
 	/// <summary>An 8x8 column-major matrix representation of a chessboard.</summary>
 	public class Board {
-		public King WhiteKing { get; private set; }
-		public King BlackKing { get; private set; }
+		public King WhiteKing {
+			get {
+				if (whiteKing == null) { InitKings(); }
+
+				return whiteKing;
+			}
+		} private King whiteKing;
+
+		public King BlackKing {
+			get {
+				if (blackKing == null) { InitKings(); }
+
+				return blackKing;
+			}
+		} private King blackKing;
+
 		private readonly Piece[,] boardMatrix;
 		
 		public Piece this[Square position] {
@@ -37,24 +51,25 @@ namespace UnityChess {
 			// this may be a memory hog since each Board has a list of Piece's, and each piece has a list of Movement's
 			// avg number turns/Board's per game should be around ~80. usual max number of pieces per board is 32
 			boardMatrix = new Piece[8, 8];
-			for (int file = 1; file <= 8; file++)
+			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					Piece pieceToCopy = board[file, rank];
-					if (pieceToCopy == null) continue;
+					if (pieceToCopy == null) { continue; }
 
 					this[file, rank] = pieceToCopy.DeepCopy();
 				}
-
-			InitKings();
+			}
 		}
 
 		public void ClearBoard() {
-			for (int file = 1; file <= 8; file++)
-				for (int rank = 1; rank <= 8; rank++)
+			for (int file = 1; file <= 8; file++) {
+				for (int rank = 1; rank <= 8; rank++) {
 					this[file, rank] = null;
+				}
+			}
 
-			WhiteKing = null;
-			BlackKing = null;
+			whiteKing = null;
+			blackKing = null;
 		}
 
 		public void SetStartingPosition() {
@@ -94,9 +109,6 @@ namespace UnityChess {
 							break;
 					}
 				}
-
-			WhiteKing = (King) this[5, 1];
-			BlackKing = (King) this[5, 8];
 		}
 
 		public void MovePiece(Movement move) {
@@ -114,14 +126,14 @@ namespace UnityChess {
 
 		internal bool IsOccupiedBySideAt(Square position, Side side) => this[position] is Piece piece && piece.Owner == side;
 
-		public void InitKings() {
+		private void InitKings() {
 			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					if (this[file, rank] is King king) {
 						if (king.Owner == Side.White) {
-							WhiteKing = king;
+							whiteKing = king;
 						} else {
-							BlackKing = king;
+							blackKing = king;
 						}
 					}
 				}
