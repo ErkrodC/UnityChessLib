@@ -4,7 +4,6 @@ namespace UnityChess {
 	/// <summary>Representation of a standard chess game including a history of moves made.</summary>
 	public class Game {
 		public Mode Mode { get; }
-		public int LatestHalfMoveIndex => HalfMoveTimeline.HeadIndex;
 		public Timeline<GameConditions> ConditionsTimeline { get; }
 		public Timeline<Board> BoardTimeline { get; }
 		public Timeline<HalfMove> HalfMoveTimeline { get; }
@@ -86,7 +85,9 @@ namespace UnityChess {
 		}
 
 		public bool ResetGameToHalfMoveIndex(int halfMoveIndex) {
-			if (LatestHalfMoveIndex == -1) return false; // i.e. No possible move to reset to
+			if (HalfMoveTimeline.HeadIndex == -1) {
+				return false;
+			}
 
 			BoardTimeline.HeadIndex = halfMoveIndex + 1;
 			ConditionsTimeline.HeadIndex = halfMoveIndex + 1;
