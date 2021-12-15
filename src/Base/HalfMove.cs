@@ -55,7 +55,7 @@ namespace UnityChess {
 				}
 				case Pawn: {
 					string promotionPiece = Move is PromotionMove promotionMove
-						? $"={pieceTypeToANSymbolMap[promotionMove.AssociatedPiece.GetType()]}"
+						? $"={pieceTypeToANSymbolMap[promotionMove.PromotionPiece.GetType()]}"
 						: string.Empty;
 
 					moveText = $"{pieceSymbol}{capture}{endSquare}{promotionPiece}{suffix}";

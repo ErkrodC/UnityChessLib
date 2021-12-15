@@ -70,8 +70,9 @@ namespace UnityChess {
 			
 			foreach (int rookFile in rookFiles) {
 				bool checkingQueenside = rookFile == 1;
-				
-				if (board[rookFile, castlingRank] is not Rook rook
+
+				Square rookSquare = new Square(rookFile, castlingRank);
+				if (board[rookSquare] is not Rook rook
 				    || rook.Owner != Owner
 				    || checkingQueenside && !canCastleQueenside
 				    || !checkingQueenside && !canCastleKingSide
@@ -82,7 +83,7 @@ namespace UnityChess {
 				Square inBetweenSquare0 = new Square(checkingQueenside ? 4 : 6, castlingRank);
 				Square inBetweenSquare1 = new Square(checkingQueenside ? 3 : 7, castlingRank);
 				Square inBetweenSquare2 = new Square(2, castlingRank);
-				Movement castlingMove = new CastlingMove(position, inBetweenSquare1, rook);
+				Movement castlingMove = new CastlingMove(position, inBetweenSquare1, rookSquare);
 				
 				if (!board.IsOccupiedAt(inBetweenSquare0)
 				    && !board.IsOccupiedAt(inBetweenSquare1)
@@ -96,7 +97,7 @@ namespace UnityChess {
 					}
 
 					movesByStartEndSquare[(position, inBetweenSquare1)]
-						= new CastlingMove(position, inBetweenSquare1, rook);
+						= new CastlingMove(position, inBetweenSquare1, rookSquare);
 				}
 			}
 		}

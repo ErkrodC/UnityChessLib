@@ -94,11 +94,11 @@ namespace UnityChess {
 				return;
 			}
 
-			Square lateralSquare = enPassantEligibleSquare + new Square(0, -Owner.ForwardDirection());
-			if (lateralSquare.IsValid()
-			    && board[lateralSquare] is Pawn enemyPawn
-			    && enemyPawn.Owner != Owner
-			    && Rules.MoveObeysRules(board, new EnPassantMove(position, enPassantEligibleSquare, enemyPawn), Owner)
+			Square capturedPawnSquare = enPassantEligibleSquare + new Square(0, -Owner.ForwardDirection());
+			if (capturedPawnSquare.IsValid()
+			    && board[capturedPawnSquare] is Pawn capturedPawn
+			    && capturedPawn.Owner != Owner
+			    && Rules.MoveObeysRules(board, new EnPassantMove(position, enPassantEligibleSquare, capturedPawnSquare), Owner)
 			) {
 				if (movesByStartEndSquares == null) {
 					movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
@@ -107,7 +107,7 @@ namespace UnityChess {
 				movesByStartEndSquares[(position, enPassantEligibleSquare)] = new EnPassantMove(
 					position,
 					enPassantEligibleSquare,
-					enemyPawn
+					capturedPawnSquare
 				);
 			}
 		}

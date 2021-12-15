@@ -1,23 +1,42 @@
-﻿namespace UnityChess {
+﻿using System;
+
+namespace UnityChess {
 	/// <summary>Representation of a castling move; inherits from SpecialMove.</summary>
 	public class CastlingMove : SpecialMove {
+		public readonly Square RookSquare;
+
 		/// <summary>Creates a new CastlingMove instance.</summary>
 		/// <param name="kingPosition">Position of the king to be castled.</param>
 		/// <param name="end">Square on which the king will land on.</param>
-		/// <param name="rook">The rook associated with the castling move.</param>
-		public CastlingMove(Square kingPosition, Square end, Rook rook) : base(kingPosition, end, rook) { }
+		/// <param name="rookSquare">The square of the rook associated with the castling move.</param>
+		public CastlingMove(Square kingPosition, Square end, Square rookSquare) : base(kingPosition, end) {
+			RookSquare = rookSquare;
+		}
 
 		/// <summary>Handles moving the associated rook to the correct position on the board.</summary>
 		/// <param name="board">Board on which the move is being made.</param>
 		public override void HandleAssociatedPiece(Board board) {
-			switch (AssociatedPiece.Position.File) {
-				case 1: //queenside castling move
-					board.MovePiece(new Movement(AssociatedPiece.Position, new Square(AssociatedPiece.Position, 3, 0)));
-					break;
-				case 8: //kingside castling move
-					board.MovePiece(new Movement(AssociatedPiece.Position, new Square(AssociatedPiece.Position,-2, 0)));
-					break;
+			if (board[RookSquare] is Rook rook) {
+				board[RookSquare] = null;
+				board[GetRookEndSquare()] = rook;
+			} else {
+				throw new ArgumentException(
+					$"{nameof(CastlingMove)}.{nameof(HandleAssociatedPiece)}:\n"
+					+ $"No {nameof(Rook)} found at {nameof(RookSquare)}"
+				);
 			}
+		}
+
+		public Square GetRookEndSquare() {
+			int rookFileOffset = RookSquare.File switch {
+				1 => 3,
+				8 => -2,
+				_ => throw new ArgumentException(
+					$"{nameof(RookSquare)}.{nameof(RookSquare.File)} is invalid"
+				)
+			};
+
+			return RookSquare + new Square(rookFileOffset, 0);
 		}
 	}
 }

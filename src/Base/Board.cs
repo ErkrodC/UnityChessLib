@@ -4,8 +4,8 @@ namespace UnityChess {
 	/// <summary>An 8x8 matrix representation of a chessboard.</summary>
 	public class Board {
 		private readonly Piece[,] boardMatrix;
-		private King whiteKing;
-		private King blackKing;
+		private Square? currentWhiteKingSquare;
+		private Square? currentBlackKingSquare;
 		
 		public Piece this[Square position] {
 			get {
@@ -57,8 +57,8 @@ namespace UnityChess {
 				}
 			}
 
-			whiteKing = null;
-			blackKing = null;
+			currentWhiteKingSquare = null;
+			currentBlackKingSquare = null;
 		}
 
 		private static Piece[] startingPositionPieces;
@@ -114,11 +114,21 @@ namespace UnityChess {
 		}
 
 		public void MovePiece(Movement move) {
-			if (!(this[move.Start] is Piece pieceToMove)) throw new ArgumentException($"No piece was found at the given position: {move.Start}");
-			
+			if (this[move.Start] is not { } pieceToMove) {
+				throw new ArgumentException($"No piece was found at the given position: {move.Start}");
+			}
+
 			this[move.Start] = null;
 			this[move.End] = pieceToMove;
 
+			if (pieceToMove is King) {
+				switch (pieceToMove.Owner) {
+					case Side.Black:
+						break;
+					case Side.White: 
+						break;
+				}
+			}
 			pieceToMove.Position = move.End;
 
 			(move as SpecialMove)?.HandleAssociatedPiece(this);
@@ -128,15 +138,15 @@ namespace UnityChess {
 
 		internal bool IsOccupiedBySideAt(Square position, Side side) => this[position] is Piece piece && piece.Owner == side;
 
-		public King GetKing(Side player) {
-			if (whiteKing == null || blackKing == null) {
+		public Square GetKingSquare(Side player) {
+			if (currentWhiteKingSquare == null || currentBlackKingSquare == null) {
 				for (int file = 1; file <= 8; file++) {
 					for (int rank = 1; rank <= 8; rank++) {
 						if (this[file, rank] is King king) {
 							if (king.Owner == Side.White) {
-								whiteKing = king;
+								currentWhiteKingSquare = new Square(file, rank);
 							} else {
-								blackKing = king;
+								currentBlackKingSquare = new Square(file, rank);
 							}
 						}
 					}
@@ -144,9 +154,9 @@ namespace UnityChess {
 			}
 
 			return player switch {
-				Side.White => whiteKing,
-				Side.Black => blackKing,
-				_ => null
+				Side.White => currentWhiteKingSquare ?? Square.Invalid,
+				Side.Black => currentBlackKingSquare ?? Square.Invalid,
+				_ => Square.Invalid
 			};
 		}
 

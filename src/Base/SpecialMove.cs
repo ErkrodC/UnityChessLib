@@ -1,10 +1,7 @@
 ﻿namespace UnityChess {
 	public abstract class SpecialMove : Movement {
-		public Piece AssociatedPiece { get; protected set; }
-
-		protected SpecialMove(Square piecePosition, Square end, Piece associatedPiece) : base(piecePosition, end) {
-			AssociatedPiece = associatedPiece;
-		}
+		protected SpecialMove(Square piecePosition, Square end)
+			: base(piecePosition, end) { }
 
 		public abstract void HandleAssociatedPiece(Board board);
 	}

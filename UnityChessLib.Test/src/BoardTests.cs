@@ -35,11 +35,7 @@ namespace UnityChess.Test {
 		public void MovePiece_SpecialMove_HandleAssocPieceCalled() {
 			Mock<SpecialMove> mockSpecialMove = new(
 				new Square(1, 2),
-				new Square(1, 3),
-				new Pawn(
-					new Square(1, 2),
-					Side.White
-				)
+				new Square(1, 3)
 			);
 
 			board.MovePiece(mockSpecialMove.Object);

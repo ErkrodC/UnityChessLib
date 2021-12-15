@@ -18,9 +18,9 @@ namespace UnityChess.Test {
 			board[capturedPawnStartSquare] = capturedPawn;
 			
 			
-			EnPassantMove mepm = new EnPassantMove(Square.Invalid, Square.Invalid, capturedPawn);
+			EnPassantMove enPassantMove = new EnPassantMove(Square.Invalid, Square.Invalid, capturedPawnStartSquare);
 
-			mepm.HandleAssociatedPiece(board);
+			enPassantMove.HandleAssociatedPiece(board);
 
 			Assert.AreNotEqual(board[capturedPawn.Position], capturedPawn);
 		}

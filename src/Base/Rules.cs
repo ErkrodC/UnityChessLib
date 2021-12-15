@@ -13,9 +13,7 @@ namespace UnityChess {
 
 		/// <summary>Checks if the player of the given side is in check.</summary>
 		public static bool IsPlayerInCheck(Board board, Side player) =>
-			// ER TODO remove .Position by maintaining king position over ref to king during board moves,
-			// similarly with InitKings to initialize king positions for a given board
-			IsSquareAttacked(board.GetKing(player).Position, board, player);
+			IsSquareAttacked(board.GetKingSquare(player), board, player);
 
 		internal static bool MoveObeysRules(Board board, Movement move, Side movedPieceSide) {
 			if (!move.Start.IsValid()

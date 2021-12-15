@@ -27,9 +27,7 @@ namespace UnityChess {
 
 		/// <summary>Executes passed move and switches sides; also adds move to history.</summary>
 		public bool TryExecuteMove(Movement move) {
-			if (!TryGetLegalMove(move.Start, move.End, out Movement validatedMove)
-			    || validatedMove is PromotionMove { AssociatedPiece: null }
-			) {
+			if (!TryGetLegalMove(move.Start, move.End, out Movement validatedMove)) {
 				return false;
 			}
 
