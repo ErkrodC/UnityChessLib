@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace UnityChess {
 	/// <summary>Representation of a standard chess game including a history of moves made.</summary>
@@ -26,7 +27,9 @@ namespace UnityChess {
 
 		/// <summary>Executes passed move and switches sides; also adds move to history.</summary>
 		public bool TryExecuteMove(Movement move) {
-			if (!TryGetLegalMove(move.Start, move.End, out Movement validatedMove)) {
+			if (!TryGetLegalMove(move.Start, move.End, out Movement validatedMove)
+			    || validatedMove is PromotionMove { AssociatedPiece: null }
+			) {
 				return false;
 			}
 
