@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace UnityChess {
+﻿namespace UnityChess {
 	/// Non-board, non-move-record game state
 	public struct GameConditions {
 		public static GameConditions NormalStartingConditions = new GameConditions(

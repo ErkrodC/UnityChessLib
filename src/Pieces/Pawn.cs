@@ -31,29 +31,30 @@ namespace UnityChess {
 			Movement testMove = new Movement(position, endSquare);
 			
 			if (!board.IsOccupiedAt(endSquare)
-			    && Rules.MoveObeysRules(board, testMove, Owner)
 			) {
-				if (movesByStartEndSquares == null) {
-					movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
-				}
-
-				bool amOnEnemyPawnRank = position.Rank == Owner.Complement().PawnRank();
-				movesByStartEndSquares[(position, endSquare)] = amOnEnemyPawnRank
-					? new PromotionMove(position, endSquare)
-					: new Movement(position, endSquare);
-			}
-			
-			if (position.Rank == Owner.PawnRank()) {
-				endSquare += new Square(0, forwardDirection);
-				testMove = new Movement(position, endSquare);
-				if (!board.IsOccupiedAt(endSquare)
-				    && Rules.MoveObeysRules(board, testMove, Owner)
-				) {
+				if (Rules.MoveObeysRules(board, testMove, Owner)) {
 					if (movesByStartEndSquares == null) {
 						movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
 					}
 
-					movesByStartEndSquares[(testMove.Start, testMove.End)] = new Movement(testMove);
+					bool amOnEnemyPawnRank = position.Rank == Owner.Complement().PawnRank();
+					movesByStartEndSquares[(position, endSquare)] = amOnEnemyPawnRank
+						? new PromotionMove(position, endSquare)
+						: new Movement(position, endSquare);
+				}
+				
+				if (position.Rank == Owner.PawnRank()) {
+					endSquare += new Square(0, forwardDirection);
+					testMove = new Movement(position, endSquare);
+					if (!board.IsOccupiedAt(endSquare)
+					    && Rules.MoveObeysRules(board, testMove, Owner)
+					) {
+						if (movesByStartEndSquares == null) {
+							movesByStartEndSquares = new Dictionary<(Square, Square), Movement>();
+						}
+
+						movesByStartEndSquares[(testMove.Start, testMove.End)] = new Movement(testMove);
+					}
 				}
 			}
 		}
