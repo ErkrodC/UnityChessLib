@@ -4,7 +4,6 @@ namespace UnityChess {
 	/// <summary>Representation of a standard chess game including a history of moves made.</summary>
 	public class Game {
 		public Mode Mode { get; }
-		public Side SideToMove { get; private set; }
 		public int LatestHalfMoveIndex => HalfMoveTimeline.HeadIndex;
 		public Timeline<GameConditions> ConditionsTimeline { get; }
 		public Timeline<Board> BoardTimeline { get; }
@@ -17,7 +16,6 @@ namespace UnityChess {
 
 		public Game(Mode mode, GameConditions startingConditions, params Piece[] pieces) {
 			Mode = mode;
-			SideToMove = Side.White;
 
 			BoardTimeline = new Timeline<Board> { new Board(pieces) };
 			HalfMoveTimeline = new Timeline<HalfMove>();
@@ -39,13 +37,13 @@ namespace UnityChess {
 			resultingBoard.MovePiece(validatedMove);
 			BoardTimeline.AddNext(resultingBoard);
 
-			SideToMove = SideToMove.Complement();
-			
+			GameConditions conditionsBeforeMove = ConditionsTimeline.Current;
+			Side updatedSideToMove = conditionsBeforeMove.SideToMove.Complement();
+			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, updatedSideToMove);
 			bool capturedPiece = boardBeforeMove[validatedMove.End] != null || validatedMove is EnPassantMove;
-			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, SideToMove);
 			
 			HalfMove halfMove = new HalfMove(boardBeforeMove[validatedMove.Start], validatedMove, capturedPiece, causedCheck);
-			GameConditions resultingGameConditions = ConditionsTimeline.Current.CalculateEndingConditions(boardBeforeMove, halfMove);
+			GameConditions resultingGameConditions = conditionsBeforeMove.CalculateEndingConditions(boardBeforeMove, halfMove);
 			ConditionsTimeline.AddNext(resultingGameConditions);
 
 			Dictionary<Piece, Dictionary<(Square, Square), Movement>> legalMovesByPiece
@@ -56,8 +54,8 @@ namespace UnityChess {
 			LegalMovesTimeline.AddNext(legalMovesByPiece);
 
 			halfMove.SetGameEndBools(
-				Rules.IsPlayerStalemated(resultingBoard, SideToMove, numLegalMoves),
-				Rules.IsPlayerCheckmated(resultingBoard, SideToMove, numLegalMoves)
+				Rules.IsPlayerStalemated(resultingBoard, updatedSideToMove, numLegalMoves),
+				Rules.IsPlayerCheckmated(resultingBoard, updatedSideToMove, numLegalMoves)
 			);
 			HalfMoveTimeline.AddNext(halfMove);
 			
@@ -76,10 +74,8 @@ namespace UnityChess {
 			legalMoves = null;
 
 			if (movingPiece != null
-			    && LegalMovesTimeline.Current.TryGetValue(
-				    movingPiece,
-				    out Dictionary<(Square, Square), Movement> movesByStartEndSquares
-			    )
+			    && LegalMovesTimeline.Current is { } legalMovesByPiece
+			    && legalMovesByPiece.TryGetValue(movingPiece, out var movesByStartEndSquares)
 			    && movesByStartEndSquares != null
 			) {
 				legalMoves = movesByStartEndSquares.Values;
@@ -96,8 +92,7 @@ namespace UnityChess {
 			ConditionsTimeline.HeadIndex = halfMoveIndex + 1;
 			LegalMovesTimeline.HeadIndex = halfMoveIndex + 1;
 			HalfMoveTimeline.HeadIndex = halfMoveIndex;
-			SideToMove = halfMoveIndex % 2 == 0 ? Side.Black : Side.White;
-			
+
 			return true;
 		}
 		

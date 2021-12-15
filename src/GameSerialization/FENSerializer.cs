@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 namespace UnityChess {
 	public class FENSerializer : IGameSerializer {
@@ -15,9 +15,49 @@ namespace UnityChess {
 				+ $" {currentConditions.TurnNumber}";
 		}
 		
-		// TODO implement
 		public Game Deserialize(string fen) {
-			throw new NotImplementedException();
+			string[] split = fen.Split(" ");
+			string castlingInfoString = split[2];
+
+			return new Game(
+				Mode.HumanVsHuman,
+				new GameConditions(
+					sideToMove: split[1] == "w" ? Side.White : Side.Black,
+					whiteCanCastleKingside: castlingInfoString.Contains("K"),
+					whiteCanCastleQueenside: castlingInfoString.Contains("Q"),
+					blackCanCastleKingside: castlingInfoString.Contains("k"),
+					blackCanCastleQueenside: castlingInfoString.Contains("q"),
+					enPassantSquare: split[3] == "-" ? Square.Invalid : new Square(split[3]),
+					halfMoveClock: int.Parse(split[4]),
+					turnNumber: int.Parse(split[5])
+				),
+				GetPieces(split[0])
+			);
+		}
+
+		private static Piece[] GetPieces(string boardString) {
+			List<Piece> result = new List<Piece>();
+			
+			string[] rankStrings = boardString.Split("/");
+			for (int i = 0; i < rankStrings.Length; ++i) {
+				string rankString = rankStrings[i];
+
+				int file = 1;
+				foreach (char character in rankString) {
+					if (int.TryParse(character.ToString(), out int emptySpaces)) {
+						file += emptySpaces;
+						continue;
+					}
+
+					result.Add(GetPieceFromFENSymbol(
+						character.ToString(),
+						file++,
+						8 - i
+					));
+				}
+			}
+
+			return result.ToArray();
 		}
 
 		private static string CalculateBoardString(Board currentBoard) {
@@ -49,25 +89,38 @@ namespace UnityChess {
 			return string.Join("/", rankStrings);
 		}
 
-		public static string GetFENPieceSymbol(Piece piece) {
-			bool isWhite = piece?.Owner == Side.White;
+		private static Piece GetPieceFromFENSymbol(string character, int file, int rank) {
+			string loweredSymbol = character.ToLower();
+			Side side = loweredSymbol == character
+				? Side.Black
+				: Side.White;
 
-			switch (piece) {
-				case Bishop:
-					return isWhite ? "B" : "b";
-				case King:
-					return isWhite ? "K" : "k";
-				case Knight:
-					return isWhite ? "N" : "n";
-				case Pawn:
-					return isWhite ? "P" : "p";
-				case Queen:
-					return isWhite ? "Q" : "q";
-				case Rook:
-					return isWhite ? "R" : "r";
-				default:
-					return string.Empty;
-			}
+			return loweredSymbol switch {
+				"b" => new Bishop(new Square(file, rank), side),
+				"k" => new King(new Square(file, rank), side),
+				"n" => new Knight(new Square(file, rank), side),
+				"p" => new Pawn(new Square(file, rank), side),
+				"q" => new Queen(new Square(file, rank), side),
+				"r" => new Rook(new Square(file, rank), side),
+				_ => null
+			};
+		}
+
+		public static string GetFENPieceSymbol(Piece piece) {
+			string result = piece switch {
+				Bishop => "B",
+				King => "K",
+				Knight => "N",
+				Pawn => "P",
+				Queen => "Q",
+				Rook => "R",
+				_ => "U"
+			};
+
+			return piece switch {
+				{ Owner: Side.Black } => result.ToLower(),
+				_ => result
+			};
 		}
 
 		private static string CalculateCastlingInfoString(GameConditions currentGameConditions) {
