@@ -2,8 +2,8 @@
 
 namespace UnityChess {
 	public class Queen : Piece<Queen> {
-		public Queen() : base(Square.Invalid, Side.None) {}
-		public Queen(Square startingPosition, Side owner) : base(startingPosition, owner) {}
+		public Queen() : base(Side.None) {}
+		public Queen(Side owner) : base(owner) {}
 
 		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
 			Board board,

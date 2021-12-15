@@ -2,8 +2,8 @@
 
 namespace UnityChess {
 	public class Rook : Piece<Rook> {
-		public Rook() : base(Square.Invalid, Side.None) {}
-		public Rook(Square startingPosition, Side owner) : base(startingPosition, owner) {}
+		public Rook() : base(Side.None) {}
+		public Rook(Side owner) : base(owner) {}
 
 		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
 			Board board,

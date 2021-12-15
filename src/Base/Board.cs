@@ -24,12 +24,12 @@ namespace UnityChess {
 			set => this[new Square(file, rank)] = value;
 		}
 
-		/// <summary>Creates a Board with initial chess game position.</summary>
-		public Board(params Piece[] pieces) {
+		/// <summary>Creates a Board given the passed square-piece pairs.</summary>
+		public Board(params (Square, Piece)[] squarePiecePairs) {
 			boardMatrix = new Piece[8, 8];
 			
-			foreach (Piece piece in pieces) {
-				this[piece.Position] = piece;
+			foreach ((Square position, Piece piece) in squarePiecePairs) {
+				this[position] = piece;
 			}
 		}
 
@@ -61,57 +61,43 @@ namespace UnityChess {
 			currentBlackKingSquare = null;
 		}
 
-		private static Piece[] startingPositionPieces;
-		public static Piece[] GetStartingPositionPieces() {
-			if (startingPositionPieces == null) {
-				startingPositionPieces = new Piece[32];
-
-				int filled = 0;
-
-				//Row 2/Rank 7 and Row 7/Rank 2, both rows of pawns
-				for (int file = 1; file <= 8; file++) {
-					foreach (int rank in new[] { 2, 7 }) {
-						Square position = new Square(file, rank);
-						Side pawnColor = rank == 2
-							? Side.White
-							: Side.Black;
-						startingPositionPieces[filled++] = new Pawn(position, pawnColor);
-					}
-				}
-
-				//Rows 1 & 8/Ranks 8 & 1, back rows for both players
-				for (int file = 1; file <= 8; file++) {
-					foreach (int rank in new[] { 1, 8 }) {
-						Square position = new Square(file, rank);
-						Side pieceColor = rank == 1
-							? Side.White
-							: Side.Black;
-						switch (file) {
-							case 1:
-							case 8:
-								startingPositionPieces[filled++] = new Rook(position, pieceColor);
-								break;
-							case 2:
-							case 7:
-								startingPositionPieces[filled++] = new Knight(position, pieceColor);
-								break;
-							case 3:
-							case 6:
-								startingPositionPieces[filled++] = new Bishop(position, pieceColor);
-								break;
-							case 4:
-								startingPositionPieces[filled++] = new Queen(position, pieceColor);
-								break;
-							case 5:
-								startingPositionPieces[filled++] = new King(position, pieceColor);
-								break;
-						}
-					}
-				}
-			}
-
-			return startingPositionPieces;
-		}
+		public static readonly (Square, Piece)[] StartingPositionPieces = {
+			(new Square("a1"), new Rook(Side.White)),
+			(new Square("b1"), new Knight(Side.White)),
+			(new Square("c1"), new Bishop(Side.White)),
+			(new Square("d1"), new Queen(Side.White)),
+			(new Square("e1"), new King(Side.White)),
+			(new Square("f1"), new Bishop(Side.White)),
+			(new Square("g1"), new Knight(Side.White)),
+			(new Square("h1"), new Rook(Side.White)),
+			
+			(new Square("a2"), new Pawn(Side.White)),
+			(new Square("b2"), new Pawn(Side.White)),
+			(new Square("c2"), new Pawn(Side.White)),
+			(new Square("d2"), new Pawn(Side.White)),
+			(new Square("e2"), new Pawn(Side.White)),
+			(new Square("f2"), new Pawn(Side.White)),
+			(new Square("g2"), new Pawn(Side.White)),
+			(new Square("h2"), new Pawn(Side.White)),
+			
+			(new Square("a8"), new Rook(Side.Black)),
+			(new Square("b8"), new Knight(Side.Black)),
+			(new Square("c8"), new Bishop(Side.Black)),
+			(new Square("d8"), new Queen(Side.Black)),
+			(new Square("e8"), new King(Side.Black)),
+			(new Square("f8"), new Bishop(Side.Black)),
+			(new Square("g8"), new Knight(Side.Black)),
+			(new Square("h8"), new Rook(Side.Black)),
+			
+			(new Square("a7"), new Pawn(Side.Black)),
+			(new Square("b7"), new Pawn(Side.Black)),
+			(new Square("c7"), new Pawn(Side.Black)),
+			(new Square("d7"), new Pawn(Side.Black)),
+			(new Square("e7"), new Pawn(Side.Black)),
+			(new Square("f7"), new Pawn(Side.Black)),
+			(new Square("g7"), new Pawn(Side.Black)),
+			(new Square("h7"), new Pawn(Side.Black)),
+		};
 
 		public void MovePiece(Movement move) {
 			if (this[move.Start] is not { } pieceToMove) {
@@ -129,7 +115,6 @@ namespace UnityChess {
 						break;
 				}
 			}
-			pieceToMove.Position = move.End;
 
 			(move as SpecialMove)?.HandleAssociatedPiece(this);
 		}

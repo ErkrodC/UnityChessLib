@@ -4,11 +4,9 @@ namespace UnityChess {
 	/// <summary>Base class for any chess piece.</summary>
 	public abstract class Piece {
 		public Side Owner { get; protected set; }
-		public Square Position { get; protected internal set; }
-		
-		protected Piece(Square startPosition, Side owner) {
+
+		protected Piece(Side owner) {
 			Owner = owner;
-			Position = startPosition;
 		}
 
 		public abstract Piece DeepCopy();
@@ -23,12 +21,11 @@ namespace UnityChess {
 	}
 
 	public abstract class Piece<T> : Piece where T : Piece<T>, new() {
-		protected Piece(Square startPosition, Side owner) : base(startPosition, owner) { }
+		protected Piece(Side owner) : base(owner) { }
 		
 		public override Piece DeepCopy() {
 			return new T {
-				Owner = Owner,
-				Position = Position
+				Owner = Owner
 			};
 		}
 	}

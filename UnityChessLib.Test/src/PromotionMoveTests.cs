@@ -19,7 +19,7 @@ namespace UnityChess.Test {
 		public void HandleAssociatedPiece_PromotionMove_ElectedPieceGenerated(ElectedPiece election) {
 			Square expectedPosition = new Square(1, 8);
 			PromotionMove mpm = new PromotionMove(Square.Invalid, expectedPosition);
-			mpm.SetPromotionPiece(PromotionUtil.GeneratePromotionPiece(election, expectedPosition, Side.White));
+			mpm.SetPromotionPiece(PromotionUtil.GeneratePromotionPiece(election, Side.White));
 
 			mpm.HandleAssociatedPiece(board);
 

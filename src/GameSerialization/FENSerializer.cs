@@ -35,8 +35,8 @@ namespace UnityChess {
 			);
 		}
 
-		private static Piece[] GetPieces(string boardString) {
-			List<Piece> result = new List<Piece>();
+		private static (Square, Piece)[] GetPieces(string boardString) {
+			List<(Square, Piece)> result = new List<(Square, Piece)>();
 			
 			string[] rankStrings = boardString.Split("/");
 			for (int i = 0; i < rankStrings.Length; ++i) {
@@ -49,10 +49,11 @@ namespace UnityChess {
 						continue;
 					}
 
-					result.Add(GetPieceFromFENSymbol(
-						character.ToString(),
-						file++,
-						8 - i
+					result.Add((
+						new Square(file++, 8 - i),
+						GetPieceFromFENSymbol(
+							character.ToString()
+						)
 					));
 				}
 			}
@@ -89,19 +90,19 @@ namespace UnityChess {
 			return string.Join("/", rankStrings);
 		}
 
-		private static Piece GetPieceFromFENSymbol(string character, int file, int rank) {
+		private static Piece GetPieceFromFENSymbol(string character) {
 			string loweredSymbol = character.ToLower();
 			Side side = loweredSymbol == character
 				? Side.Black
 				: Side.White;
 
 			return loweredSymbol switch {
-				"b" => new Bishop(new Square(file, rank), side),
-				"k" => new King(new Square(file, rank), side),
-				"n" => new Knight(new Square(file, rank), side),
-				"p" => new Pawn(new Square(file, rank), side),
-				"q" => new Queen(new Square(file, rank), side),
-				"r" => new Rook(new Square(file, rank), side),
+				"b" => new Bishop(side),
+				"k" => new King(side),
+				"n" => new Knight(side),
+				"p" => new Pawn(side),
+				"q" => new Queen(side),
+				"r" => new Rook(side),
 				_ => null
 			};
 		}

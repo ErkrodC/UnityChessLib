@@ -4,8 +4,8 @@ namespace UnityChess {
 	public class King : Piece<King> {
 		private static readonly int[] rookFiles = { 1, 8 };
 		
-		public King() : base(Square.Invalid, Side.None) {}
-		public King(Square startingPosition, Side owner) : base(startingPosition, owner) {}
+		public King() : base(Side.None) {}
+		public King(Side owner) : base(owner) {}
 
 		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
 			Board board,

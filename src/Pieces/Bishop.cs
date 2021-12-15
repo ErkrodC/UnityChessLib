@@ -2,8 +2,8 @@
 
 namespace UnityChess {
 	public class Bishop : Piece<Bishop> {
-		public Bishop() : base(Square.Invalid, Side.None) {}
-		public Bishop(Square startingPosition, Side owner) : base(startingPosition, owner) {}
+		public Bishop() : base(Side.None) {}
+		public Bishop(Side owner) : base(owner) {}
 
 		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
 			Board board,

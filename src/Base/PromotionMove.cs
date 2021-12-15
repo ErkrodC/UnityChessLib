@@ -17,7 +17,7 @@ namespace UnityChess {
 				throw new ArgumentNullException(
 					$"{nameof(HandleAssociatedPiece)}:\n"
 					+ $"{nameof(PromotionMove)}.{nameof(PromotionPiece)} was null.\n"
-					+ $"You must first call {nameof(PromotionMove)}.{nameof(PromotionMove.SetPromotionPiece)}"
+					+ $"You must first call {nameof(PromotionMove)}.{nameof(SetPromotionPiece)}"
 					+ $" before it can be executed."
 				);
 			}

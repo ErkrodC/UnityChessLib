@@ -11,7 +11,7 @@ namespace UnityChess.Test {
 		[TestCase(40)]
 		[TestCase(64)]
 		public void CalculateAllPiecesLegalMoves_PiecesOnBoard_CalculateLegalMovesCalled(int numberOfPieces) {
-			Mock<Piece> mockPiece = new Mock<Piece>(MockBehavior.Loose, Square.Invalid, Side.White);
+			Mock<Piece> mockPiece = new Mock<Piece>(MockBehavior.Loose, Side.White);
 			Board board = CreateBoard(numberOfPieces, mockPiece);
 
 			Game.CalculateLegalMovesForPosition(board, GameConditions.NormalStartingConditions);

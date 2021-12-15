@@ -134,49 +134,49 @@ namespace UnityChess.Test {
 		
 		private static class RulesTestData {
 			private static Board StartingPositionNone(Side side) {
-				return new Board(Board.GetStartingPositionPieces());
+				return new Board(Board.StartingPositionPieces);
 			}
 
 			private static Board BishopPinRookNone(Side side) {
 				return new Board(
-					new King(new Square(4, 4), side),
-					new Rook(new Square(5, 5), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Bishop(new Square(6, 6), side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(5, 5), new Rook(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(new Square(6, 6), new Bishop(side.Complement()))
 				);
 			}
 
 			private static Board RookPinBishopNone(Side side) {
 				return new Board(
-					new King(new Square(4, 4), side),
-					new Bishop(new Square(4, 5), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Rook(new Square(4, 6), side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(4, 5), new Bishop(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(new Square(4, 6), new Rook(side.Complement()))
 				);
 			}
 
 			private static Board NeutralKnightNone(Side side) {
 				return new Board(
-					new King(new Square(4, 4), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Knight(new Square(6, 4), side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(new Square(6, 4), new Knight(side.Complement()))
 				);
 			}
 
 			private static Board NeutralPawnsNone(Side side) {
 				return side == Side.White
 					? new Board(
-						new King(new Square(4, 4), side),
-						new King(new Square(8, 1), side.Complement()),
-						new Pawn(new Square(3, 3), side.Complement()),
-						new Pawn(new Square(5, 3), side.Complement())
+						(new Square(4, 4), new King(side)),
+						(new Square(8, 1), new King(side.Complement())),
+						(new Square(3, 3), new Pawn(side.Complement())),
+						(new Square(5, 3), new Pawn(side.Complement()))
 					)
 					// ER TODO shouldn't this check?
 					: new Board(
-						new King(new Square(4, 4), side),
-						new King(new Square(8, 1), side.Complement()),
-						new Pawn(new Square(3, 5), side.Complement()),
-						new Pawn(new Square(5, 5), side.Complement())
+						(new Square(4, 4), new King(side)),
+						(new Square(8, 1), new King(side.Complement())),
+						(new Square(3, 5), new Pawn(side.Complement())),
+						(new Square(5, 5), new Pawn(side.Complement()))
 					);
 			}
 
@@ -214,9 +214,9 @@ namespace UnityChess.Test {
 				}
 
 				return side => new Board(
-					new King(new Square(4, 4), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Queen(queenSquare, side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(queenSquare, new Queen(side.Complement()))
 				);
 			}
 
@@ -242,9 +242,9 @@ namespace UnityChess.Test {
 				}
 
 				return side => new Board(
-					new King(new Square(4, 4), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Rook(rookSquare, side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(rookSquare, new Rook(side.Complement()))
 				);
 			}
 
@@ -270,9 +270,9 @@ namespace UnityChess.Test {
 				}
 
 				return side => new Board(
-					new King(new Square(4, 4), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Bishop(bishopSquare, side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(bishopSquare, new Bishop(side.Complement()))
 				);
 			}
 
@@ -290,9 +290,9 @@ namespace UnityChess.Test {
 				};
 
 				return side => new Board(
-					new King(new Square(4, 4), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Knight(knightSquare, side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(knightSquare, new Knight(side.Complement()))
 				);
 			}
 
@@ -312,23 +312,23 @@ namespace UnityChess.Test {
 				};
 
 				return side => new Board(
-					new King(new Square(4, 4), side),
-					new King(new Square(8, 1), side.Complement()),
-					new Pawn(pawnSquare, side.Complement())
+					(new Square(4, 4), new King(side)),
+					(new Square(8, 1), new King(side.Complement())),
+					(pawnSquare, new Pawn(side.Complement()))
 				);
 			}
 
 			private static Board KingPawnStalemate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(6, 1), side),
-						new King(new Square(6, 3), side.Complement()),
-						new Pawn(new Square(6, 2), side.Complement())
+						(new Square(6, 1), new King(side)),
+						(new Square(6, 3), new King(side.Complement())),
+						(new Square(6, 2), new Pawn(side.Complement()))
 					),
 					Side.Black => new Board(
-						new King(new Square(6, 8), side),
-						new King(new Square(6, 6), side.Complement()),
-						new Pawn(new Square(6, 7), side.Complement())
+						(new Square(6, 8), new King(side)),
+						(new Square(6, 6), new King(side.Complement())),
+						(new Square(6, 7), new Pawn(side.Complement()))
 					),
 					_ => default
 				};
@@ -336,52 +336,52 @@ namespace UnityChess.Test {
 
 			private static Board KingRookStalemate(Side side) {
 				return new Board(
-					new King(new Square(1, 1), side),
-					new King(new Square(3, 3), side.Complement()),
-					new Rook(new Square(2, 2), side.Complement())
+					(new Square(1, 1), new King(side)),
+					(new Square(3, 3), new King(side.Complement())),
+					(new Square(2, 2), new Rook(side.Complement()))
 				);
 			}
 
 			private static Board KingBishopStalemate(Side side) {
 				return new Board(
-					new King(new Square(1, 8), side),
-					new King(new Square(1, 6), side.Complement()),
-					new Bishop(new Square(6, 4), side.Complement())
+					(new Square(1, 8), new King(side)),
+					(new Square(1, 6), new King(side.Complement())),
+					(new Square(6, 4), new Bishop(side.Complement()))
 				);
 			}
 
 			private static Board RookPinBishopStalemate(Side side) {
 				return new Board(
-					new King(new Square(1, 8), side),
-					new King(new Square(2, 6), side.Complement()),
-					new Rook(new Square(8, 8), side.Complement()),
-					new Bishop(new Square(2, 8), side)
+					(new Square(1, 8), new King(side)),
+					(new Square(2, 6), new King(side.Complement())),
+					(new Square(8, 8), new Rook(side.Complement())),
+					(new Square(2, 8), new Bishop(side))
 				);
 			}
 
 			private static Board QueenStalemate(Side side) {
 				return new Board(
-					new King(new Square(1, 1), side),
-					new King(new Square(8, 8), side.Complement()),
-					new Queen(new Square(2, 3), side.Complement())
+					(new Square(1, 1), new King(side)),
+					(new Square(8, 8), new King(side.Complement())),
+					(new Square(2, 3), new Queen(side.Complement()))
 				);
 			}
 
 			private static Board AnandVsKramnikStalemate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(8, 5), side),
-						new Pawn(new Square(8, 4), side),
-						new King(new Square(6, 5), side.Complement()),
-						new Pawn(new Square(6, 6), side.Complement()),
-						new Pawn(new Square(7, 7), side.Complement())
+						(new Square(8, 5), new King(side)),
+						(new Square(8, 4), new Pawn(side)),
+						(new Square(6, 5), new King(side.Complement())),
+						(new Square(6, 6), new Pawn(side.Complement())),
+						(new Square(7, 7), new Pawn(side.Complement()))
 					),
 					Side.Black => new Board(
-						new King(new Square(8, 4), side),
-						new Pawn(new Square(8, 5), side),
-						new King(new Square(6, 4), side.Complement()),
-						new Pawn(new Square(6, 3), side.Complement()),
-						new Pawn(new Square(7, 2), side.Complement())
+						(new Square(8, 4), new King(side)),
+						(new Square(8, 5), new Pawn(side)),
+						(new Square(6, 4), new King(side.Complement())),
+						(new Square(6, 3), new Pawn(side.Complement())),
+						(new Square(7, 2), new Pawn(side.Complement()))
 					),
 					_ => null
 				};
@@ -390,18 +390,18 @@ namespace UnityChess.Test {
 			private static Board KorchnoiVsKarpovStalemate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(8, 2), side),
-						new Pawn(new Square(1, 5), side),
-						new King(new Square(6, 2), side.Complement()),
-						new Bishop(new Square(7, 2), side.Complement()),
-						new Pawn(new Square(1, 6), side.Complement())
+						(new Square(8, 2), new King(side)),
+						(new Square(1, 5), new Pawn(side)),
+						(new Square(6, 2), new King(side.Complement())),
+						(new Square(7, 2), new Bishop(side.Complement())),
+						(new Square(1, 6), new Pawn(side.Complement()))
 					),
 					Side.Black => new Board(
-						new King(new Square(8, 7), side),
-						new Pawn(new Square(1, 4), side),
-						new King(new Square(6, 7), side.Complement()),
-						new Bishop(new Square(7, 7), side.Complement()),
-						new Pawn(new Square(1, 3), side.Complement())
+						(new Square(8, 7), new King(side)),
+						(new Square(1, 4), new Pawn(side)),
+						(new Square(6, 7), new King(side.Complement())),
+						(new Square(7, 7), new Bishop(side.Complement())),
+						(new Square(1, 3), new Pawn(side.Complement()))
 					),
 					_ => null
 				};
@@ -410,16 +410,16 @@ namespace UnityChess.Test {
 			private static Board BernsteinVsSmyslovStalemate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(6, 3), side),
-						new King(new Square(6, 5), side.Complement()),
-						new Rook(new Square(2, 2), side.Complement()),
-						new Pawn(new Square(6, 4), side.Complement())
+						(new Square(6, 3), new King(side)),
+						(new Square(6, 5), new King(side.Complement())),
+						(new Square(2, 2), new Rook(side.Complement())),
+						(new Square(6, 4), new Pawn(side.Complement()))
 					),
 					Side.Black => new Board(
-						new King(new Square(6, 6), side),
-						new King(new Square(6, 4), side.Complement()),
-						new Rook(new Square(2, 7), side.Complement()),
-						new Pawn(new Square(6, 5), side.Complement())
+						(new Square(6, 6), new King(side)),
+						(new Square(6, 4), new King(side.Complement())),
+						(new Square(2, 7), new Rook(side.Complement())),
+						(new Square(6, 5), new Pawn(side.Complement()))
 					),
 					_ => null
 				};
@@ -428,36 +428,36 @@ namespace UnityChess.Test {
 			private static Board GelfandVsKramnikStalemate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(8, 2), side),
-						new Pawn(new Square(1, 3), side),
-						new Pawn(new Square(6, 3), side),
-						new Pawn(new Square(7, 2), side),
-						new Pawn(new Square(8, 3), side),
-						new King(new Square(8, 7), side.Complement()),
-						new Rook(new Square(5, 2), side.Complement()),
-						new Queen(new Square(4, 1), side.Complement()),
-						new Pawn(new Square(1, 4), side.Complement()),
-						new Pawn(new Square(4, 5), side.Complement()),
-						new Pawn(new Square(6, 4), side.Complement()),
-						new Pawn(new Square(6, 6), side.Complement()),
-						new Pawn(new Square(7, 5), side.Complement()),
-						new Pawn(new Square(8, 4), side.Complement())
+						(new Square(8, 2), new King(side)),
+						(new Square(1, 3), new Pawn(side)),
+						(new Square(6, 3), new Pawn(side)),
+						(new Square(7, 2), new Pawn(side)),
+						(new Square(8, 3), new Pawn(side)),
+						(new Square(8, 7), new King(side.Complement())),
+						(new Square(5, 2), new Rook(side.Complement())),
+						(new Square(4, 1), new Queen(side.Complement())),
+						(new Square(1, 4), new Pawn(side.Complement())),
+						(new Square(4, 5), new Pawn(side.Complement())),
+						(new Square(6, 4), new Pawn(side.Complement())),
+						(new Square(6, 6), new Pawn(side.Complement())),
+						(new Square(7, 5), new Pawn(side.Complement())),
+						(new Square(8, 4), new Pawn(side.Complement()))
 					),
 					Side.Black => new Board(
-						new King(new Square(8, 7), side),
-						new Pawn(new Square(1, 6), side),
-						new Pawn(new Square(6, 6), side),
-						new Pawn(new Square(7, 7), side),
-						new Pawn(new Square(8, 6), side),
-						new King(new Square(8, 2), side.Complement()),
-						new Rook(new Square(5, 7), side.Complement()),
-						new Queen(new Square(4, 8), side.Complement()),
-						new Pawn(new Square(1, 5), side.Complement()),
-						new Pawn(new Square(4, 4), side.Complement()),
-						new Pawn(new Square(6, 5), side.Complement()),
-						new Pawn(new Square(6, 3), side.Complement()),
-						new Pawn(new Square(7, 4), side.Complement()),
-						new Pawn(new Square(8, 5), side.Complement())
+						(new Square(8, 7), new King(side)),
+						(new Square(1, 6), new Pawn(side)),
+						(new Square(6, 6), new Pawn(side)),
+						(new Square(7, 7), new Pawn(side)),
+						(new Square(8, 6), new Pawn(side)),
+						(new Square(8, 2), new King(side.Complement())),
+						(new Square(5, 7), new Rook(side.Complement())),
+						(new Square(4, 8), new Queen(side.Complement())),
+						(new Square(1, 5), new Pawn(side.Complement())),
+						(new Square(4, 4), new Pawn(side.Complement())),
+						(new Square(6, 5), new Pawn(side.Complement())),
+						(new Square(6, 3), new Pawn(side.Complement())),
+						(new Square(7, 4), new Pawn(side.Complement())),
+						(new Square(8, 5), new Pawn(side.Complement()))
 					),
 					_ => null
 				};
@@ -465,69 +465,69 @@ namespace UnityChess.Test {
 
 			private static Board DoubleRookCheckmate(Side side) {
 				return new Board(
-					new King(new Square(1, 1), side),
-					new King(new Square(8, 8), side.Complement()),
-					new Rook(new Square(8, 1), side.Complement()),
-					new Rook(new Square(8, 2), side.Complement())
+					(new Square(1, 1), new King(side)),
+					(new Square(8, 8), new King(side.Complement())),
+					(new Square(8, 1), new Rook(side.Complement())),
+					(new Square(8, 2), new Rook(side.Complement()))
 				);
 			}
 
 			private static Board KingQueenCheckmate(Side side) {
 				return new Board(
-					new King(new Square(8, 5), side),
-					new King(new Square(6, 5), side.Complement()),
-					new Queen(new Square(7, 5), side.Complement())
+					(new Square(8, 5), new King(side)),
+					(new Square(6, 5), new King(side.Complement())),
+					(new Square(7, 5), new Queen(side.Complement()))
 				);
 			}
 
 			private static Board KingRookCheckmate(Side side) {
 				return new Board(
-					new King(new Square(8, 5), side),
-					new King(new Square(6, 5), side.Complement()),
-					new Rook(new Square(8, 1), side.Complement())
+					(new Square(8, 5), new King(side)),
+					(new Square(6, 5), new King(side.Complement())),
+					(new Square(8, 1), new Rook(side.Complement()))
 				);
 			}
 
 			private static Board KingDoubleBishopCheckmate(Side side) {
 				return new Board(
-					new King(new Square(8, 8), side),
-					new King(new Square(7, 6), side.Complement()),
-					new Bishop(new Square(1, 2), side.Complement()),
-					new Bishop(new Square(2, 2), side.Complement())
+					(new Square(8, 8), new King(side)),
+					(new Square(7, 6), new King(side.Complement())),
+					(new Square(1, 2), new Bishop(side.Complement())),
+					(new Square(2, 2), new Bishop(side.Complement()))
 				);
 			}
 
 			private static Board KingBishopKnightCheckmate(Side side) {
 				return new Board(
-					new King(new Square(1, 8), side),
-					new King(new Square(2, 6), side.Complement()),
-					new Bishop(new Square(3, 6), side.Complement()),
-					new Knight(new Square(1, 6), side.Complement())
+					(new Square(1, 8), new King(side)),
+					(new Square(2, 6), new King(side.Complement())),
+					(new Square(3, 6), new Bishop(side.Complement())),
+					(new Square(1, 6), new Knight(side.Complement()))
 				);
 			}
 
 			private static Board KingDoubleKnightCheckmate(Side side) {
 				return new Board(
-					new King(new Square(8, 8), side),
-					new King(new Square(8, 6), side.Complement()),
-					new Knight(new Square(6, 6), side.Complement()),
-					new Knight(new Square(7, 6), side.Complement())
+					(new Square(8, 8), new King(side)),
+					(new Square(8, 6), new King(side.Complement())),
+					(new Square(6, 6), new Knight(side.Complement())),
+					(new Square(7, 6), new Knight(side.Complement()))
 				);
 			}
 
 			private static Board KingDoublePawnCheckmate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(5, 1), side),
-						new King(new Square(5, 3), side.Complement()),
-						new Pawn(new Square(5, 2), side.Complement()),
-						new Pawn(new Square(4, 2), side.Complement())
+						(new Square(5, 1), new King(side)),
+						(new Square(5, 3), new King(side.Complement())),
+						(new Square(5, 2), new Pawn(side.Complement())),
+						(new Square(4, 2), new Pawn(side.Complement()))
 					),
 					Side.Black => new Board(
-						new King(new Square(5, 8), side),
-						new King(new Square(5, 6), side.Complement()),
-						new Pawn(new Square(5, 7), side.Complement()),
-						new Pawn(new Square(4, 7), side.Complement())
+						(new Square(5, 8), new King(side)),
+						(new Square(5, 6), new King(side.Complement())),
+						(new Square(5, 7), new Pawn(side.Complement())),
+						(new Square(4, 7), new Pawn(side.Complement()))
 					),
 					_ => null
 				};
@@ -536,20 +536,20 @@ namespace UnityChess.Test {
 			private static Board BackRankCheckmate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(7, 1), side),
-						new King(new Square(7, 8), side.Complement()),
-						new Rook(new Square(1, 1), side.Complement()),
-						new Pawn(new Square(6, 2), side),
-						new Pawn(new Square(7, 2), side),
-						new Pawn(new Square(8, 2), side)
+						(new Square(7, 1), new King(side)),
+						(new Square(7, 8), new King(side.Complement())),
+						(new Square(1, 1), new Rook(side.Complement())),
+						(new Square(6, 2), new Pawn(side)),
+						(new Square(7, 2), new Pawn(side)),
+						(new Square(8, 2), new Pawn(side))
 					),
 					Side.Black => new Board(
-						new King(new Square(7, 8), side),
-						new King(new Square(7, 1), side.Complement()),
-						new Rook(new Square(1, 8), side.Complement()),
-						new Pawn(new Square(6, 7), side),
-						new Pawn(new Square(7, 7), side),
-						new Pawn(new Square(8, 7), side)
+						(new Square(7, 8), new King(side)),
+						(new Square(7, 1), new King(side.Complement())),
+						(new Square(1, 8), new Rook(side.Complement())),
+						(new Square(6, 7), new Pawn(side)),
+						(new Square(7, 7), new Pawn(side)),
+						(new Square(8, 7), new Pawn(side))
 					),
 					_ => null
 				};
@@ -558,20 +558,20 @@ namespace UnityChess.Test {
 			private static Board SmotheredCheckmate(Side side) {
 				return side switch {
 					Side.White => new Board(
-						new King(new Square(8, 1), side),
-						new King(new Square(7, 7), side.Complement()),
-						new Knight(new Square(6, 2), side.Complement()),
-						new Pawn(new Square(7, 2), side),
-						new Pawn(new Square(8, 2), side),
-						new Rook(new Square(7, 1), side)
+						(new Square(8, 1), new King(side)),
+						(new Square(7, 7), new King(side.Complement())),
+						(new Square(6, 2), new Knight(side.Complement())),
+						(new Square(7, 2), new Pawn(side)),
+						(new Square(8, 2), new Pawn(side)),
+						(new Square(7, 1), new Rook(side))
 					),
 					Side.Black => new Board(
-						new King(new Square(8, 8), side),
-						new King(new Square(7, 2), side.Complement()),
-						new Knight(new Square(6, 7), side.Complement()),
-						new Pawn(new Square(7, 7), side),
-						new Pawn(new Square(8, 7), side),
-						new Rook(new Square(7, 8), side)
+						(new Square(8, 8), new King(side)),
+						(new Square(7, 2), new King(side.Complement())),
+						(new Square(6, 7), new Knight(side.Complement())),
+						(new Square(7, 7), new Pawn(side)),
+						(new Square(8, 7), new Pawn(side)),
+						(new Square(7, 8), new Rook(side))
 					),
 					_ => null
 				};
@@ -579,19 +579,19 @@ namespace UnityChess.Test {
 
 			private static Board KnightRookCheckmate(Side side) {
 				return new Board(
-					new King(new Square(8, 8), side),
-					new King(new Square(7, 1), side.Complement()),
-					new Knight(new Square(6, 6), side.Complement()),
-					new Rook(new Square(8, 7), side.Complement())
+					(new Square(8, 8), new King(side)),
+					(new Square(7, 1), new King(side.Complement())),
+					(new Square(6, 6), new Knight(side.Complement())),
+					(new Square(8, 7), new Rook(side.Complement()))
 				);
 			}
 
 			private static Board QueenBishopCheckmate(Side side) {
 				return new Board(
-					new King(new Square(7, 8), side),
-					new King(new Square(7, 1), side.Complement()),
-					new Queen(new Square(7, 7), side.Complement()),
-					new Bishop(new Square(8, 6), side.Complement())
+					(new Square(7, 8), new King(side)),
+					(new Square(7, 1), new King(side.Complement())),
+					(new Square(7, 7), new Queen(side.Complement())),
+					(new Square(8, 6), new Bishop(side.Complement()))
 				);
 			}
 

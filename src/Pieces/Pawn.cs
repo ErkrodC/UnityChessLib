@@ -4,8 +4,8 @@ namespace UnityChess {
 	public class Pawn : Piece<Pawn> {
 		private static readonly int[] adjacentFileOffsets = {-1, 1};
 		
-		public Pawn() : base(Square.Invalid, Side.None) {}
-		public Pawn(Square startingPosition, Side owner) : base(startingPosition, owner) {}
+		public Pawn() : base(Side.None) {}
+		public Pawn(Side owner) : base(owner) {}
 
 		public override Dictionary<(Square, Square), Movement> CalculateLegalMoves(
 			Board board,

@@ -6,11 +6,13 @@ namespace UnityChess.Test {
 	public class BoardTests {
 		private static Board board;
 		private static Piece pawn;
+		private static Square pawnStartSquare;
 
 		[SetUp]
 		public void Init() {
-			pawn = new Pawn(new Square(1, 2), Side.White);
-			board = new Board(pawn);
+			pawnStartSquare = new Square(1, 2);
+			pawn = new Pawn(Side.White);
+			board = new Board((pawnStartSquare, pawn));
 		}
 
 		[Test]
@@ -20,15 +22,13 @@ namespace UnityChess.Test {
 		[TestCase(8, 2)]
 		[TestCase(3, 4)]
 		public void MovePiece_NormalMove_PieceIsMoved(int expectedFile, int expectedRank) {
-			Square initialPosition = pawn.Position;
 			Square expectedPosition = new Square(expectedFile, expectedRank);
-			Movement move = new Movement(initialPosition, expectedPosition);
+			Movement move = new Movement(pawnStartSquare, expectedPosition);
 			
 			board.MovePiece(move);
-			
-			Assert.AreEqual(expectedPosition, pawn.Position);
-			Assert.AreEqual(board[expectedPosition], pawn);
-			Assert.AreEqual(board[initialPosition], null);
+
+			Assert.AreEqual(pawn, board[expectedPosition]);
+			Assert.AreEqual(null, board[pawnStartSquare]);
 		}
 
 		[Test]

@@ -12,12 +12,12 @@ namespace UnityChess {
 
 		/// <summary>Creates a Game instance of a given mode with a standard starting Board.</summary>
 		/// <param name="mode">Describes which players are human or AI.</param>
-		public Game(Mode mode) : this(mode, GameConditions.NormalStartingConditions, Board.GetStartingPositionPieces()) { }
+		public Game(Mode mode) : this(mode, GameConditions.NormalStartingConditions, Board.StartingPositionPieces) { }
 
-		public Game(Mode mode, GameConditions startingConditions, params Piece[] pieces) {
+		public Game(Mode mode, GameConditions startingConditions, params (Square, Piece)[] squarePiecePairs) {
 			Mode = mode;
 
-			BoardTimeline = new Timeline<Board> { new Board(pieces) };
+			BoardTimeline = new Timeline<Board> { new Board(squarePiecePairs) };
 			HalfMoveTimeline = new Timeline<HalfMove>();
 			ConditionsTimeline = new Timeline<GameConditions> { startingConditions };
 			LegalMovesTimeline = new Timeline<Dictionary<Piece, Dictionary<(Square, Square), Movement>>> {
