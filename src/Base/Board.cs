@@ -145,13 +145,13 @@ namespace UnityChess {
 			};
 		}
 
-		public string ToASCIIArt() {
+		public string ToTextArt() {
 			string result = string.Empty;
 			
 			for (int rank = 8; rank >= 1; --rank) {
 				for (int file = 1; file <= 8; ++file) {
 					Piece piece = this[file, rank];
-					result += piece == null ? " " : FENSerializer.GetFENPieceSymbol(piece);
+					result += GetUnicodeSymbol(piece);
 					result += file != 8
 						? "|"
 						: $"\t {rank}";
@@ -164,5 +164,21 @@ namespace UnityChess {
 
 			return result;
 		}
+		
+		private static string GetUnicodeSymbol(Piece piece) => piece switch {
+			Bishop { Owner: Side.White } => "♝",
+			Bishop { Owner: Side.Black } => "♗",
+			King { Owner: Side.White } => "♚",
+			King { Owner: Side.Black } => "♔",
+			Knight { Owner: Side.White } => "♞",
+			Knight { Owner: Side.Black } => "♘",
+			Queen { Owner: Side.White } => "♛",
+			Queen { Owner: Side.Black } => "♕",
+			Pawn { Owner: Side.White } => "♟",
+			Pawn { Owner: Side.Black } => "♙",
+			Rook { Owner: Side.White } => "♜",
+			Rook { Owner: Side.Black } => "♖",
+			_ => "."
+		};
 	}
 }

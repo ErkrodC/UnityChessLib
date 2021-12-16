@@ -14,7 +14,7 @@ namespace UnityChess {
 				+ $" {currentConditions.HalfMoveClock}"
 				+ $" {currentConditions.TurnNumber}";
 		}
-		
+
 		public Game Deserialize(string fen) {
 			string[] split = fen.Split(" ");
 			string castlingInfoString = split[2];
@@ -28,8 +28,8 @@ namespace UnityChess {
 					blackCanCastleKingside: castlingInfoString.Contains("k"),
 					blackCanCastleQueenside: castlingInfoString.Contains("q"),
 					enPassantSquare: split[3] == "-" ? Square.Invalid : new Square(split[3]),
-					halfMoveClock: int.Parse(split[4]),
-					turnNumber: int.Parse(split[5])
+					halfMoveClock: split.Length >= 5 ? int.Parse(split[4]) : 0,
+					turnNumber: split.Length >= 6 ? int.Parse(split[5]) : 0
 				),
 				GetPieces(split[0])
 			);
@@ -107,7 +107,7 @@ namespace UnityChess {
 			};
 		}
 
-		public static string GetFENPieceSymbol(Piece piece) {
+		private static string GetFENPieceSymbol(Piece piece) {
 			string result = piece switch {
 				Bishop => "B",
 				King => "K",
