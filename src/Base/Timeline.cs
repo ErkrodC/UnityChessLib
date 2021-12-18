@@ -4,7 +4,17 @@ using System.Collections.Generic;
 
 namespace UnityChess {
 	public class Timeline<T> : IList<T> {
-		public T Current => list[headIndexBacking];
+		public bool TryGetCurrent(out T current) {
+			current = default;
+
+			if (0 <= headIndexBacking && headIndexBacking < list.Count) {
+				current = list[headIndexBacking];
+				return true;
+			}
+
+			return false;
+		}
+
 		public int Count => list.Count;
 		public bool IsReadOnly => false;
 		public bool IsUpToDate => headIndexBacking == list.Count - 1;

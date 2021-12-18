@@ -8,7 +8,7 @@ namespace UnityChess.Test {
 			Game game = new FENSerializer().Deserialize(
 				"rnbqk1nr/pppp1ppp/8/4p3/1b1P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 2 3"
 			);
-			Board board = game.BoardTimeline.Current;
+			game.BoardTimeline.TryGetCurrent(out Board board);
 
 			game.TryGetLegalMovesForPiece(board[new Square("c2")], out var legalMovesForBlockedPawn);
 

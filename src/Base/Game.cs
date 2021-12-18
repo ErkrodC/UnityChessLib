@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace UnityChess {
 	/// <summary>Representation of a standard chess game including a history of moves made.</summary>
 	public class Game {
-		public Mode Mode { get; }
 		public Timeline<GameConditions> ConditionsTimeline { get; }
 		public Timeline<Board> BoardTimeline { get; }
 		public Timeline<HalfMove> HalfMoveTimeline { get; }
 		public Timeline<Dictionary<Piece, Dictionary<(Square, Square), Movement>>> LegalMovesTimeline { get; }
 
 		/// <summary>Creates a Game instance of a given mode with a standard starting Board.</summary>
-		/// <param name="mode">Describes which players are human or AI.</param>
-		public Game(Mode mode) : this(mode, GameConditions.NormalStartingConditions, Board.StartingPositionPieces) { }
+		public Game() : this(GameConditions.NormalStartingConditions, Board.StartingPositionPieces) { }
 
-		public Game(Mode mode, GameConditions startingConditions, params (Square, Piece)[] squarePiecePairs) {
-			Mode = mode;
-
-			BoardTimeline = new Timeline<Board> { new Board(squarePiecePairs) };
+		public Game(GameConditions startingConditions, params (Square, Piece)[] squarePiecePairs) {
+			Board startingBoard = new Board(squarePiecePairs);
+			BoardTimeline = new Timeline<Board> { startingBoard };
 			HalfMoveTimeline = new Timeline<HalfMove>();
 			ConditionsTimeline = new Timeline<GameConditions> { startingConditions };
 			LegalMovesTimeline = new Timeline<Dictionary<Piece, Dictionary<(Square, Square), Movement>>> {
-				CalculateLegalMovesForPosition(BoardTimeline.Current, ConditionsTimeline.Current)
+				CalculateLegalMovesForPosition(startingBoard, startingConditions)
 			};
 		}
 
@@ -32,12 +28,12 @@ namespace UnityChess {
 			}
 
 			//create new copy of previous current board, and execute the move on it
-			Board boardBeforeMove = BoardTimeline.Current;
+			BoardTimeline.TryGetCurrent(out Board boardBeforeMove);
 			Board resultingBoard = new Board(boardBeforeMove);
 			resultingBoard.MovePiece(validatedMove);
 			BoardTimeline.AddNext(resultingBoard);
-
-			GameConditions conditionsBeforeMove = ConditionsTimeline.Current;
+			
+			ConditionsTimeline.TryGetCurrent(out GameConditions conditionsBeforeMove); 
 			Side updatedSideToMove = conditionsBeforeMove.SideToMove.Complement();
 			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, updatedSideToMove);
 			bool capturedPiece = boardBeforeMove[validatedMove.End] != null || validatedMove is EnPassantMove;
@@ -65,8 +61,10 @@ namespace UnityChess {
 		public bool TryGetLegalMove(Square startSquare, Square endSquare, out Movement move) {
 			move = null;
 
-			return BoardTimeline.Current[startSquare] is { } movingPiece
-			       && LegalMovesTimeline.Current.TryGetValue(movingPiece, out Dictionary<(Square, Square), Movement> movesByStartEndSquares)
+			return BoardTimeline.TryGetCurrent(out Board currentBoard)
+			       && LegalMovesTimeline.TryGetCurrent(out Dictionary<Piece, Dictionary<(Square, Square), Movement>> currentLegalMoves)
+			       && currentBoard[startSquare] is { } movingPiece
+			       && currentLegalMoves.TryGetValue(movingPiece, out Dictionary<(Square, Square), Movement> movesByStartEndSquares)
 			       && movesByStartEndSquares.TryGetValue((startSquare, endSquare), out move);
 		}
 		
@@ -74,8 +72,8 @@ namespace UnityChess {
 			legalMoves = null;
 
 			if (movingPiece != null
-			    && LegalMovesTimeline.Current is { } legalMovesByPiece
-			    && legalMovesByPiece.TryGetValue(movingPiece, out var movesByStartEndSquares)
+			    && LegalMovesTimeline.TryGetCurrent(out Dictionary<Piece, Dictionary<(Square, Square), Movement>> legalMovesByPiece)
+			    && legalMovesByPiece.TryGetValue(movingPiece, out Dictionary<(Square, Square), Movement> movesByStartEndSquares)
 			    && movesByStartEndSquares != null
 			) {
 				legalMoves = movesByStartEndSquares.Values;

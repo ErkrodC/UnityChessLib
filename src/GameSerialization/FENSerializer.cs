@@ -3,11 +3,12 @@
 namespace UnityChess {
 	public class FENSerializer : IGameSerializer {
 		public string Serialize(Game game) {
-			GameConditions currentConditions = game.ConditionsTimeline.Current;
+			game.ConditionsTimeline.TryGetCurrent(out GameConditions currentConditions);
 			Square currentEnPassantSquare = currentConditions.EnPassantSquare;
 
+			game.BoardTimeline.TryGetCurrent(out Board currentBoard);
 			return
-				$"{CalculateBoardString(game.BoardTimeline.Current)}"
+				$"{CalculateBoardString(currentBoard)}"
 				+ $" {(currentConditions.SideToMove == Side.White ? "w" : "b")}"
 				+ $" {CalculateCastlingInfoString(currentConditions)}"
 				+ $" {(currentEnPassantSquare.IsValid() ? SquareUtil.SquareToString(currentEnPassantSquare) : "-")}"
@@ -20,7 +21,6 @@ namespace UnityChess {
 			string castlingInfoString = split[2];
 
 			return new Game(
-				Mode.HumanVsHuman,
 				new GameConditions(
 					sideToMove: split[1] == "w" ? Side.White : Side.Black,
 					whiteCanCastleKingside: castlingInfoString.Contains("K"),

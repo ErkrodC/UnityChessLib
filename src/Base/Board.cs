@@ -151,7 +151,7 @@ namespace UnityChess {
 			for (int rank = 8; rank >= 1; --rank) {
 				for (int file = 1; file <= 8; ++file) {
 					Piece piece = this[file, rank];
-					result += GetUnicodeSymbol(piece);
+					result += piece.ToTextArt();
 					result += file != 8
 						? "|"
 						: $"\t {rank}";
@@ -163,22 +163,6 @@ namespace UnityChess {
 			result += "a b c d e f g h";
 
 			return result;
-		}
-		
-		private static string GetUnicodeSymbol(Piece piece) => piece switch {
-			Bishop { Owner: Side.White } => "♝",
-			Bishop { Owner: Side.Black } => "♗",
-			King { Owner: Side.White } => "♚",
-			King { Owner: Side.Black } => "♔",
-			Knight { Owner: Side.White } => "♞",
-			Knight { Owner: Side.Black } => "♘",
-			Queen { Owner: Side.White } => "♛",
-			Queen { Owner: Side.Black } => "♕",
-			Pawn { Owner: Side.White } => "♟",
-			Pawn { Owner: Side.Black } => "♙",
-			Rook { Owner: Side.White } => "♜",
-			Rook { Owner: Side.Black } => "♖",
-			_ => "."
-		};
+		} 
 	}
 }
