@@ -42,5 +42,25 @@ namespace UnityChess.Test {
 
 			mockSpecialMove.Verify(specialMove => specialMove.HandleAssociatedPiece(board), Times.Exactly(1));
 		}
+
+		[Test]
+		[TestCase(Side.White)]
+		[TestCase(Side.Black)]
+		public void GetKingSquare_KingMoved_KingSquareIsUpdated(Side player) {
+			King king = new King(player);
+			Square kingStartSquare = new Square(5, player.CastlingRank());
+			Square kingEndSquare0 = kingStartSquare + new Square(0, player.ForwardDirection());
+			Square kingEndSquare1 = kingEndSquare0 + new Square(0, player.ForwardDirection());
+			board = new Board((kingStartSquare, king));
+			Movement move0 = new Movement(kingStartSquare, kingEndSquare0);
+			Movement move1 = new Movement(kingEndSquare0, kingEndSquare1);
+			
+			board.MovePiece(move0);
+			board.GetKingSquare(player);
+			board.MovePiece(move1);
+
+			Square actual = board.GetKingSquare(player);
+			Assert.AreEqual(kingEndSquare1, actual, $"e: {kingEndSquare1}, a: {actual}");
+		}
 	}
 }

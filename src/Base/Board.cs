@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UnityChess {
 	/// <summary>An 8x8 matrix representation of a chessboard.</summary>
 	public class Board {
 		private readonly Piece[,] boardMatrix;
-		private Square? currentWhiteKingSquare;
-		private Square? currentBlackKingSquare;
-		
+		private readonly Dictionary<Side, Square?> currentKingSquareBySide = new Dictionary<Side, Square?> {
+			[Side.White] = null,
+			[Side.Black] = null
+		};
+
 		public Piece this[Square position] {
 			get {
 				if (position.IsValid()) return boardMatrix[position.File - 1, position.Rank - 1];
@@ -57,8 +60,8 @@ namespace UnityChess {
 				}
 			}
 
-			currentWhiteKingSquare = null;
-			currentBlackKingSquare = null;
+			currentKingSquareBySide[Side.White] = null;
+			currentKingSquareBySide[Side.Black] = null;
 		}
 
 		public static readonly (Square, Piece)[] StartingPositionPieces = {
@@ -108,12 +111,7 @@ namespace UnityChess {
 			this[move.End] = pieceToMove;
 
 			if (pieceToMove is King) {
-				switch (pieceToMove.Owner) {
-					case Side.Black:
-						break;
-					case Side.White: 
-						break;
-				}
+				currentKingSquareBySide[pieceToMove.Owner] = move.End;
 			}
 
 			(move as SpecialMove)?.HandleAssociatedPiece(this);
@@ -124,25 +122,17 @@ namespace UnityChess {
 		internal bool IsOccupiedBySideAt(Square position, Side side) => this[position] is Piece piece && piece.Owner == side;
 
 		public Square GetKingSquare(Side player) {
-			if (currentWhiteKingSquare == null || currentBlackKingSquare == null) {
+			if (currentKingSquareBySide[player] == null) {
 				for (int file = 1; file <= 8; file++) {
 					for (int rank = 1; rank <= 8; rank++) {
 						if (this[file, rank] is King king) {
-							if (king.Owner == Side.White) {
-								currentWhiteKingSquare = new Square(file, rank);
-							} else {
-								currentBlackKingSquare = new Square(file, rank);
-							}
+							currentKingSquareBySide[king.Owner] = new Square(file, rank);
 						}
 					}
 				}
 			}
 
-			return player switch {
-				Side.White => currentWhiteKingSquare ?? Square.Invalid,
-				Side.Black => currentBlackKingSquare ?? Square.Invalid,
-				_ => Square.Invalid
-			};
+			return currentKingSquareBySide[player] ?? Square.Invalid;
 		}
 
 		public string ToTextArt() {
