@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	/// <summary>Used to describe which side's turn it currently is, and which side a piece belongs to.</summary>
 	public enum Side {
 		None,

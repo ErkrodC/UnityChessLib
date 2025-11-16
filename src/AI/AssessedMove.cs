@@ -1,4 +1,4 @@
-﻿namespace UnityChess.AI {
+﻿namespace UnityChess.Core.AI {
 	public class AssessedMove {
 
 		public AssessedMove(Movement move, int value) {

@@ -1,4 +1,4 @@
-﻿namespace UnityChess {
+﻿namespace UnityChess.Core {
 	public class PGNSerializer : IGameSerializer {
 		// TODO implement
 		public string Serialize(Game game) {

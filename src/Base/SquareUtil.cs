@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	public static class SquareUtil {
 		public static readonly Dictionary<string, int> FileCharToIntMap = new() {
 			{"a", 1},
@@ -12,7 +12,7 @@ namespace UnityChess {
 			{"g", 7},
 			{"h", 8}
 		};
-		
+
 		public static readonly Dictionary<int, string> FileIntToCharMap = new() {
 			{1, "a"},
 			{2, "b"},
@@ -23,7 +23,7 @@ namespace UnityChess {
 			{7, "g"},
 			{8, "h"}
 		};
-		
+
 		public static readonly Square[] KnightOffsets = {
 			new(-2, -1),
 			new(-2, 1),
@@ -34,7 +34,7 @@ namespace UnityChess {
 			new(1, -2),
 			new(1, 2),
 		};
-		
+
 		public static readonly Square[] SurroundingOffsets = {
 			new(-1, 0),
 			new(1, 0),
@@ -52,16 +52,16 @@ namespace UnityChess {
 			new(1, -1),
 			new(1, 1)
 		};
-		
+
 		public static readonly Square[] CardinalOffsets = {
 			new(-1, 0),
 			new(1, 0),
 			new(0, -1),
 			new(0, 1),
 		};
-		
-		
-	
+
+
+
 		public static string SquareToString(Square square) => SquareToString(square.File, square.Rank);
 		public static string SquareToString(int file, int rank) {
 			if (FileIntToCharMap.TryGetValue(file, out string fileChar)) {

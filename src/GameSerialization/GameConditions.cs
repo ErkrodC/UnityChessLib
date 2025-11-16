@@ -1,4 +1,4 @@
-﻿namespace UnityChess {
+﻿namespace UnityChess.Core {
 	/// Non-board, non-move-record game state
 	public struct GameConditions {
 		public static GameConditions NormalStartingConditions = new GameConditions(

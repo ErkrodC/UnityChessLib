@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 
-namespace UnityChess.Test {
+namespace UnityChess.Core.Test {
 	[TestFixture]
 	public class CastlingMoveTests {
 		private Board board;

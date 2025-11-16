@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	public class King : Piece<King> {
 		private static readonly int[] rookFiles = { 1, 8 };
 		

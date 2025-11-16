@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	/// <summary>Representation of a promotion move; inherits from SpecialMove.</summary>
 	public class PromotionMove : SpecialMove {
 		public Piece PromotionPiece { get; private set; }

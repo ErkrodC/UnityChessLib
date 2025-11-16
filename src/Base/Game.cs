@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	/// <summary>Representation of a standard chess game including a history of moves made.</summary>
 	public class Game {
 		public Timeline<GameConditions> ConditionsTimeline { get; }
@@ -32,12 +32,12 @@ namespace UnityChess {
 			Board resultingBoard = new Board(boardBeforeMove);
 			resultingBoard.MovePiece(validatedMove);
 			BoardTimeline.AddNext(resultingBoard);
-			
-			ConditionsTimeline.TryGetCurrent(out GameConditions conditionsBeforeMove); 
+
+			ConditionsTimeline.TryGetCurrent(out GameConditions conditionsBeforeMove);
 			Side updatedSideToMove = conditionsBeforeMove.SideToMove.Complement();
 			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, updatedSideToMove);
 			bool capturedPiece = boardBeforeMove[validatedMove.End] != null || validatedMove is EnPassantMove;
-			
+
 			HalfMove halfMove = new HalfMove(boardBeforeMove[validatedMove.Start], validatedMove, capturedPiece, causedCheck);
 			GameConditions resultingGameConditions = conditionsBeforeMove.CalculateEndingConditions(boardBeforeMove, halfMove);
 			ConditionsTimeline.AddNext(resultingGameConditions);
@@ -54,7 +54,7 @@ namespace UnityChess {
 				Rules.IsPlayerCheckmated(resultingBoard, updatedSideToMove, numLegalMoves)
 			);
 			HalfMoveTimeline.AddNext(halfMove);
-			
+
 			return true;
 		}
 
@@ -67,7 +67,7 @@ namespace UnityChess {
 			       && currentLegalMoves.TryGetValue(movingPiece, out Dictionary<(Square, Square), Movement> movesByStartEndSquares)
 			       && movesByStartEndSquares.TryGetValue((startSquare, endSquare), out move);
 		}
-		
+
 		public bool TryGetLegalMovesForPiece(Piece movingPiece, out ICollection<Movement> legalMoves) {
 			legalMoves = null;
 
@@ -95,10 +95,10 @@ namespace UnityChess {
 
 			return true;
 		}
-		
+
 		internal static int GetNumLegalMoves(Dictionary<Piece, Dictionary<(Square, Square), Movement>> legalMovesByPiece) {
 			int result = 0;
-			
+
 			if (legalMovesByPiece != null) {
 				foreach (Dictionary<(Square, Square), Movement> movesByStartEndSquares in legalMovesByPiece.Values) {
 					result += movesByStartEndSquares.Count;
@@ -107,13 +107,13 @@ namespace UnityChess {
 
 			return result;
 		}
-		
+
 		internal static Dictionary<Piece, Dictionary<(Square, Square), Movement>> CalculateLegalMovesForPosition(
 			Board board,
 			GameConditions gameConditions
 		) {
 			Dictionary<Piece, Dictionary<(Square, Square), Movement>> result = null;
-			
+
 			for (int file = 1; file <= 8; file++) {
 				for (int rank = 1; rank <= 8; rank++) {
 					if (board[file, rank] is Piece piece

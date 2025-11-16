@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	/// <summary>Contains methods for checking legality of moves and board positions.</summary>
 	public static class Rules {
 		/// <summary>Checks if the player of the given side has been checkmated.</summary>

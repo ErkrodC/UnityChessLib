@@ -1,4 +1,4 @@
-﻿namespace UnityChess {
+﻿namespace UnityChess.Core {
 	/// <summary>Representation of an en passant move; inherits from SpecialMove.</summary>
 	public class EnPassantMove : SpecialMove {
 		public readonly Square CapturedPawnSquare;

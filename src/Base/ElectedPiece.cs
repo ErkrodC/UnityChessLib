@@ -1,4 +1,4 @@
-﻿namespace UnityChess {
+﻿namespace UnityChess.Core {
 	public enum ElectedPiece {
 		Knight = 0,
 		Bishop = 1,

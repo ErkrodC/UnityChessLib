@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	/// <summary>Representation of a castling move; inherits from SpecialMove.</summary>
 	public class CastlingMove : SpecialMove {
 		public readonly Square RookSquare;

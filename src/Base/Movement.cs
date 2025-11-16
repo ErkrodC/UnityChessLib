@@ -1,4 +1,4 @@
-﻿namespace UnityChess {
+﻿namespace UnityChess.Core {
 	/// <summary>Representation of a move, namely a piece and its end square.</summary>
 	public class Movement {
 		public readonly Square Start;

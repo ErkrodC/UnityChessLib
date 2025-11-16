@@ -1,4 +1,4 @@
-﻿namespace UnityChess {
+﻿namespace UnityChess.Core {
 	/// <summary>Representation of a square on a chessboard.</summary>
 	public readonly struct Square {
 		public static readonly Square Invalid = new Square(-1, -1);

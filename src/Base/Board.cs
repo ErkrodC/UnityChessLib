@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	/// <summary>An 8x8 matrix representation of a chessboard.</summary>
 	public class Board {
 		private readonly Piece[,] boardMatrix;

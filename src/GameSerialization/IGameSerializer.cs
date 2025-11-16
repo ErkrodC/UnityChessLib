@@ -1,4 +1,4 @@
-﻿namespace UnityChess {
+﻿namespace UnityChess.Core {
 	public interface IGameSerializer {
 		string Serialize(Game game);
 

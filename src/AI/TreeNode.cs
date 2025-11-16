@@ -1,4 +1,4 @@
-﻿namespace UnityChess.AI {
+﻿namespace UnityChess.Core.AI {
 	public class TreeNode {
 
 		public TreeNode(Board board, int depth) {

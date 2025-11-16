@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Moq;
 
-namespace UnityChess.Test {
+namespace UnityChess.Core.Test {
 	[TestFixture]
 	public class GameTests {
 		[Test]

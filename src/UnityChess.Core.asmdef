@@ -1,6 +1,6 @@
 {
-    "name": "UnityChessLib",
-    "rootNamespace": "UnityChess",
+    "name": "UnityChess.Core",
+    "rootNamespace": "UnityChess.Core",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

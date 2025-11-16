@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	public class Pawn : Piece<Pawn> {
 		private static readonly int[] adjacentFileOffsets = {-1, 1};
 		

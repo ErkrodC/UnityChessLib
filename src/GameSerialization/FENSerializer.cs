@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	public class FENSerializer : IGameSerializer {
 		public string Serialize(Game game) {
 			game.ConditionsTimeline.TryGetCurrent(out GameConditions currentConditions);
@@ -37,7 +37,7 @@ namespace UnityChess {
 
 		private static (Square, Piece)[] GetPieces(string boardString) {
 			List<(Square, Piece)> result = new List<(Square, Piece)>();
-			
+
 			string[] rankStrings = boardString.Split("/");
 			for (int i = 0; i < rankStrings.Length; ++i) {
 				string rankString = rankStrings[i];

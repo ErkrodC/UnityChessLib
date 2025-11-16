@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace UnityChess.Test {
+namespace UnityChess.Core.Test {
 	[TestFixture]
 	public class RulesTests {
 		//sets up a chess position to test

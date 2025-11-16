@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	public struct HalfMove {
 		public readonly Piece Piece;
 		public readonly Movement Move;

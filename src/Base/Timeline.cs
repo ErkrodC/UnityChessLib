@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	public class Timeline<T> : IList<T> {
 		public bool TryGetCurrent(out T current) {
 			current = default;

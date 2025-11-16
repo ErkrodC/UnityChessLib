@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	public class Bishop : Piece<Bishop> {
 		public Bishop() : base(Side.None) {}
 		public Bishop(Side owner) : base(owner) {}

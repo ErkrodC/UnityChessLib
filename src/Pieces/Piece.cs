@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace UnityChess {
+namespace UnityChess.Core {
 	/// <summary>Base class for any chess piece.</summary>
 	public abstract class Piece {
 		public Side Owner { get; protected set; }
