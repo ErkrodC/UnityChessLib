@@ -1,5 +1,8 @@
-﻿namespace UnityChess.Core {
+﻿using System;
+
+namespace UnityChess.Core {
 	/// <summary>Representation of a square on a chessboard.</summary>
+	[Serializable]
 	public readonly struct Square {
 		public static readonly Square Invalid = new Square(-1, -1);
 		public readonly int File;
@@ -23,7 +26,7 @@
 			File = startPosition.File + fileOffset;
 			Rank = startPosition.Rank + rankOffset;
 		}
-		
+
 		internal readonly bool IsValid() {
 			return File is >= 1 and <= 8
 			       && Rank is >= 1 and <= 8;
@@ -32,7 +35,7 @@
 		public static bool operator ==(Square lhs, Square rhs) => lhs.File == rhs.File && lhs.Rank == rhs.Rank;
 		public static bool operator !=(Square lhs, Square rhs) => !(lhs == rhs);
 		public static Square operator +(Square lhs, Square rhs) => new Square(lhs.File + rhs.File, lhs.Rank + rhs.Rank);
-		
+
 		public bool Equals(Square other) => File == other.File && Rank == other.Rank;
 
 		public bool Equals(int file, int rank) => File == file && Rank == rank;
