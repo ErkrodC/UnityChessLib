@@ -16,29 +16,15 @@ namespace UnityChess.Core {
 			GameConditions gameConditions,
 			Square position
 		);
-		
+
 		public override string ToString() => $"{Owner} {GetType().Name}";
 
-		public string ToTextArt() => this switch {
-			Bishop { Owner: Side.White } => "♝",
-			Bishop { Owner: Side.Black } => "♗",
-			King { Owner: Side.White } => "♚",
-			King { Owner: Side.Black } => "♔",
-			Knight { Owner: Side.White } => "♞",
-			Knight { Owner: Side.Black } => "♘",
-			Queen { Owner: Side.White } => "♛",
-			Queen { Owner: Side.Black } => "♕",
-			Pawn { Owner: Side.White } => "♟",
-			Pawn { Owner: Side.Black } => "♙",
-			Rook { Owner: Side.White } => "♜",
-			Rook { Owner: Side.Black } => "♖",
-			_ => "."
-		};
+		public abstract string ToTextArt();
 	}
 
 	public abstract class Piece<T> : Piece where T : Piece<T>, new() {
 		protected Piece(Side owner) : base(owner) { }
-		
+
 		public override Piece DeepCopy() {
 			return new T {
 				Owner = Owner

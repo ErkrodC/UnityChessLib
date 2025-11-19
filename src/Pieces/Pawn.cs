@@ -3,7 +3,7 @@
 namespace UnityChess.Core {
 	public class Pawn : Piece<Pawn> {
 		private static readonly int[] adjacentFileOffsets = {-1, 1};
-		
+
 		public Pawn() : base(Side.None) {}
 		public Pawn(Side owner) : base(owner) {}
 
@@ -13,13 +13,19 @@ namespace UnityChess.Core {
 			Square position
 		) {
 			Dictionary<(Square, Square), Movement> result = null;
-			
+
 			CheckForwardMovingSquares(board, position, ref result);
 			CheckAttackingSquares(board, position, ref result);
 			CheckEnPassantCaptures(board, position, gameConditions.EnPassantSquare, ref result);
 
 			return result;
 		}
+
+		public override string ToTextArt() => Owner switch {
+			Side.White => "♟",
+			Side.Black => "♙",
+			_ => "."
+		};
 
 		private void CheckForwardMovingSquares(
 			Board board,
@@ -29,7 +35,7 @@ namespace UnityChess.Core {
 			int forwardDirection = Owner.ForwardDirection();
 			Square endSquare = new Square(position, 0, forwardDirection);
 			Movement testMove = new Movement(position, endSquare);
-			
+
 			if (!board.IsOccupiedAt(endSquare)
 			) {
 				if (Rules.MoveObeysRules(board, testMove, Owner)) {
@@ -42,7 +48,7 @@ namespace UnityChess.Core {
 						? new PromotionMove(position, endSquare)
 						: new Movement(position, endSquare);
 				}
-				
+
 				if (position.Rank == Owner.PawnRank()) {
 					endSquare += new Square(0, forwardDirection);
 					testMove = new Movement(position, endSquare);

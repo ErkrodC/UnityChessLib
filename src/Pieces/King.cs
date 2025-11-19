@@ -3,7 +3,7 @@
 namespace UnityChess.Core {
 	public class King : Piece<King> {
 		private static readonly int[] rookFiles = { 1, 8 };
-		
+
 		public King() : base(Side.None) {}
 		public King(Side owner) : base(owner) {}
 
@@ -37,6 +37,12 @@ namespace UnityChess.Core {
 			return result;
 		}
 
+		public override string ToTextArt() => Owner switch {
+			Side.White => "♚",
+			Side.Black => "♔",
+			_ => "."
+		};
+
 		private void CheckSurroundingSquares(
 			Board board,
 			Square position,
@@ -49,7 +55,7 @@ namespace UnityChess.Core {
 					if (movesByStartEndSquare == null) {
 						movesByStartEndSquare = new Dictionary<(Square, Square), Movement>();
 					}
-					
+
 					movesByStartEndSquare[(testMove.Start, testMove.End)] = new Movement(testMove);
 				}
 			}
@@ -67,7 +73,7 @@ namespace UnityChess.Core {
 			) { return; }
 
 			int castlingRank = Owner.CastlingRank();
-			
+
 			foreach (int rookFile in rookFiles) {
 				bool checkingQueenside = rookFile == 1;
 
@@ -79,12 +85,12 @@ namespace UnityChess.Core {
 				) {
 					continue;
 				}
-				
+
 				Square inBetweenSquare0 = new Square(checkingQueenside ? 4 : 6, castlingRank);
 				Square inBetweenSquare1 = new Square(checkingQueenside ? 3 : 7, castlingRank);
 				Square inBetweenSquare2 = new Square(2, castlingRank);
 				Movement castlingMove = new CastlingMove(position, inBetweenSquare1, rookSquare);
-				
+
 				if (!board.IsOccupiedAt(inBetweenSquare0)
 				    && !board.IsOccupiedAt(inBetweenSquare1)
 				    && (!board.IsOccupiedAt(inBetweenSquare2) || !checkingQueenside)

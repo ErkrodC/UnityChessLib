@@ -22,8 +22,8 @@ namespace UnityChess.Core {
 		}
 
 		/// <summary>Executes passed move and switches sides; also adds move to history.</summary>
-		public bool TryExecuteMove(Movement move) {
-			if (!TryGetLegalMove(move.Start, move.End, out Movement validatedMove)) {
+		public bool TryExecuteMove(Square start, Square end) {
+			if (!TryGetLegalMove(start, end, out Movement validatedMove)) {
 				return false;
 			}
 

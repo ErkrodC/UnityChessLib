@@ -25,7 +25,7 @@ namespace UnityChess.Core {
 
 						result[(testMove.Start, testMove.End)] = new Movement(testMove);
 					}
-					
+
 					if (board.IsOccupiedAt(endSquare)) {
 						break;
 					}
@@ -36,5 +36,11 @@ namespace UnityChess.Core {
 
 			return result;
 		}
+
+		public override string ToTextArt() => Owner switch {
+			Side.White => "♝",
+			Side.Black => "♗",
+			_ => "."
+		};
 	}
 }
