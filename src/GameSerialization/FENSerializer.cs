@@ -3,12 +3,11 @@
 namespace UnityChess.Core {
 	public class FENSerializer : IGameSerializer {
 		public string Serialize(Game game) {
-			game.ConditionsTimeline.TryGetCurrent(out GameConditions currentConditions);
+			GameConditions currentConditions = game.ConditionsTimeline.Head;
 			Square currentEnPassantSquare = currentConditions.EnPassantSquare;
 
-			game.BoardTimeline.TryGetCurrent(out Board currentBoard);
 			return
-				$"{CalculateBoardString(currentBoard)}"
+				$"{CalculateBoardString(game.BoardTimeline.Head)}"
 				+ $" {(currentConditions.SideToMove == Side.White ? "w" : "b")}"
 				+ $" {CalculateCastlingInfoString(currentConditions)}"
 				+ $" {(currentEnPassantSquare.IsValid() ? SquareUtil.SquareToString(currentEnPassantSquare) : "-")}"

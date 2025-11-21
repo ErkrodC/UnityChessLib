@@ -4,25 +4,25 @@ using System.Collections.Generic;
 
 namespace UnityChess.Core {
 	public class Timeline<T> : IList<T> {
-		public bool TryGetCurrent(out T current) {
-			current = default;
+		public T Head {
+			get {
+				if (0 <= headIndexBacking && headIndexBacking < list.Count) {
+					return list[headIndexBacking];
+				}
 
-			if (0 <= headIndexBacking && headIndexBacking < list.Count) {
-				current = list[headIndexBacking];
-				return true;
+				return default;
 			}
-
-			return false;
 		}
 
-		public int Count => list.Count;
-		public bool IsReadOnly => false;
-		public bool IsUpToDate => headIndexBacking == list.Count - 1;
 		public int HeadIndex {
 			get => headIndexBacking;
 			set => headIndexBacking = Math.Min(value, list.Count - 1);
 		} private int headIndexBacking;
-		
+
+		public int Count => list.Count;
+		public bool IsReadOnly => false;
+		public bool IsUpToDate => headIndexBacking == list.Count - 1;
+
 		private readonly List<T> list;
 		private int FutureElementsStartIndex => headIndexBacking + 1;
 		private int NumFutureElements => list.Count - FutureElementsStartIndex;
@@ -31,9 +31,9 @@ namespace UnityChess.Core {
 			headIndexBacking = -1;
 			list = new List<T>();
 		}
-		
+
 		public void Add(T element) => AddNext(element);
-		
+
 		public List<T> GetStartToCurrent() => list.GetRange(0, headIndexBacking + 1);
 
 		public List<T> PopFuture() {
@@ -53,7 +53,7 @@ namespace UnityChess.Core {
 				list.RemoveRange(FutureElementsStartIndex, NumFutureElements);
 			}
 		}
-		
+
 		public void Clear() {
 			list.Clear();
 			headIndexBacking = -1;

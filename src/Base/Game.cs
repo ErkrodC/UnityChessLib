@@ -22,24 +22,25 @@ namespace UnityChess.Core {
 		}
 
 		/// <summary>Executes passed move and switches sides; also adds move to history.</summary>
-		public bool TryExecuteMove(Square start, Square end) {
+		public bool TryExecuteMove(Square start, Square end, out HalfMove latestHalfMove) {
 			if (!TryGetLegalMove(start, end, out Movement validatedMove)) {
+				latestHalfMove = default;
 				return false;
 			}
 
 			//create new copy of previous current board, and execute the move on it
-			BoardTimeline.TryGetCurrent(out Board boardBeforeMove);
+			Board boardBeforeMove = BoardTimeline.Head;
 			Board resultingBoard = new Board(boardBeforeMove);
 			resultingBoard.MovePiece(validatedMove);
 			BoardTimeline.AddNext(resultingBoard);
 
-			ConditionsTimeline.TryGetCurrent(out GameConditions conditionsBeforeMove);
+			GameConditions conditionsBeforeMove = ConditionsTimeline.Head;
 			Side updatedSideToMove = conditionsBeforeMove.SideToMove.Complement();
 			bool causedCheck = Rules.IsPlayerInCheck(resultingBoard, updatedSideToMove);
 			bool capturedPiece = boardBeforeMove[validatedMove.End] != null || validatedMove is EnPassantMove;
 
-			HalfMove halfMove = new HalfMove(boardBeforeMove[validatedMove.Start], validatedMove, capturedPiece, causedCheck);
-			GameConditions resultingGameConditions = conditionsBeforeMove.CalculateEndingConditions(boardBeforeMove, halfMove);
+			latestHalfMove = new HalfMove(boardBeforeMove[validatedMove.Start], validatedMove, capturedPiece, causedCheck);
+			GameConditions resultingGameConditions = conditionsBeforeMove.CalculateEndingConditions(boardBeforeMove, latestHalfMove);
 			ConditionsTimeline.AddNext(resultingGameConditions);
 
 			Dictionary<Piece, Dictionary<(Square, Square), Movement>> legalMovesByPiece
@@ -49,11 +50,11 @@ namespace UnityChess.Core {
 
 			LegalMovesTimeline.AddNext(legalMovesByPiece);
 
-			halfMove.SetGameEndBools(
+			latestHalfMove.SetGameEndBools(
 				Rules.IsPlayerStalemated(resultingBoard, updatedSideToMove, numLegalMoves),
 				Rules.IsPlayerCheckmated(resultingBoard, updatedSideToMove, numLegalMoves)
 			);
-			HalfMoveTimeline.AddNext(halfMove);
+			HalfMoveTimeline.AddNext(latestHalfMove);
 
 			return true;
 		}
@@ -61,26 +62,29 @@ namespace UnityChess.Core {
 		public bool TryGetLegalMove(Square startSquare, Square endSquare, out Movement move) {
 			move = null;
 
-			return BoardTimeline.TryGetCurrent(out Board currentBoard)
-			       && LegalMovesTimeline.TryGetCurrent(out Dictionary<Piece, Dictionary<(Square, Square), Movement>> currentLegalMoves)
-			       && currentBoard[startSquare] is { } movingPiece
-			       && currentLegalMoves.TryGetValue(movingPiece, out Dictionary<(Square, Square), Movement> movesByStartEndSquares)
+			Board board = BoardTimeline.Head;
+			Dictionary<Piece, Dictionary<(Square, Square), Movement>> legalMovesByPiece = LegalMovesTimeline.Head;
+			return board != null
+			       && legalMovesByPiece != null
+			       && board[startSquare] is { } movingPiece
+			       && legalMovesByPiece.TryGetValue(movingPiece, out Dictionary<(Square, Square), Movement> movesByStartEndSquares)
 			       && movesByStartEndSquares.TryGetValue((startSquare, endSquare), out move);
 		}
 
-		public bool TryGetLegalMovesForPiece(Piece movingPiece, out ICollection<Movement> legalMoves) {
-			legalMoves = null;
+		public ICollection<Movement> GetLegalMovesForPiece(Piece movingPiece) {
+			ICollection<Movement> legalMoves = null;
+
+			Dictionary<Piece, Dictionary<(Square, Square), Movement>> legalMovesByPiece = LegalMovesTimeline.Head;
 
 			if (movingPiece != null
-			    && LegalMovesTimeline.TryGetCurrent(out Dictionary<Piece, Dictionary<(Square, Square), Movement>> legalMovesByPiece)
+			    && legalMovesByPiece != null
 			    && legalMovesByPiece.TryGetValue(movingPiece, out Dictionary<(Square, Square), Movement> movesByStartEndSquares)
 			    && movesByStartEndSquares != null
 			) {
 				legalMoves = movesByStartEndSquares.Values;
-				return true;
 			}
 
-			return false;
+			return legalMoves;
 		}
 
 		public bool ResetGameToHalfMoveIndex(int halfMoveIndex) {

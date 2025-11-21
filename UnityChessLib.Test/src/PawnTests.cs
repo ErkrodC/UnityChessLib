@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace UnityChess.Core.Test {
 	[TestFixture]
@@ -8,9 +9,9 @@ namespace UnityChess.Core.Test {
 			Game game = new FENSerializer().Deserialize(
 				"rnbqk1nr/pppp1ppp/8/4p3/1b1P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 2 3"
 			);
-			game.BoardTimeline.TryGetCurrent(out Board board);
 
-			game.TryGetLegalMovesForPiece(board[new Square("c2")], out var legalMovesForBlockedPawn);
+			Board board = game.BoardTimeline.Head;
+			ICollection<Movement> legalMovesForBlockedPawn = game.GetLegalMovesForPiece(board[new Square("c2")]);
 
 			Assert.AreEqual(0, legalMovesForBlockedPawn?.Count ?? 0);
 		}
