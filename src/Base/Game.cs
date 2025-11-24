@@ -118,19 +118,18 @@ namespace UnityChess.Core {
 		) {
 			Dictionary<Piece, Dictionary<(Square, Square), Movement>> result = null;
 
-			for (int file = 1; file <= 8; file++) {
-				for (int rank = 1; rank <= 8; rank++) {
-					if (board[file, rank] is Piece piece
-					    && piece.Owner == gameConditions.SideToMove
-					    && piece.CalculateLegalMoves(board, gameConditions, new Square(file, rank)) is
-						    { } movesByStartEndSquares
-					) {
-						if (result == null) {
-							result = new Dictionary<Piece, Dictionary<(Square, Square), Movement>>();
-						}
-
-						result[piece] = movesByStartEndSquares;
+			for (int file = 0; file < 8; file++)
+			for (int rank = 0; rank < 8; rank++) {
+				if (board[file, rank] is Piece piece
+				    && piece.Owner == gameConditions.SideToMove
+				    && piece.CalculateLegalMoves(board, gameConditions, new Square(file, rank)) is
+					    { } movesByStartEndSquares
+				   ) {
+					if (result == null) {
+						result = new Dictionary<Piece, Dictionary<(Square, Square), Movement>>();
 					}
+
+					result[piece] = movesByStartEndSquares;
 				}
 			}
 

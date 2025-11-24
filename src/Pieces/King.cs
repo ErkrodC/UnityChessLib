@@ -2,7 +2,7 @@
 
 namespace UnityChess.Core {
 	public class King : Piece<King> {
-		private static readonly int[] rookFiles = { 1, 8 };
+		private static readonly int[] rookFiles = { 0, 7 };
 
 		public King() : base(Side.None) {}
 		public King(Side owner) : base(owner) {}
@@ -86,9 +86,9 @@ namespace UnityChess.Core {
 					continue;
 				}
 
-				Square inBetweenSquare0 = new Square(checkingQueenside ? 4 : 6, castlingRank);
-				Square inBetweenSquare1 = new Square(checkingQueenside ? 3 : 7, castlingRank);
-				Square inBetweenSquare2 = new Square(2, castlingRank);
+				Square inBetweenSquare0 = new Square(checkingQueenside ? 3 : 5, castlingRank);
+				Square inBetweenSquare1 = new Square(checkingQueenside ? 2 : 6, castlingRank);
+				Square inBetweenSquare2 = new Square(1, castlingRank);
 				Movement castlingMove = new CastlingMove(position, inBetweenSquare1, rookSquare);
 
 				if (!board.IsOccupiedAt(inBetweenSquare0)
