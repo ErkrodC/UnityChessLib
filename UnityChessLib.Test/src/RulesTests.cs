@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
+using UnityChess.Util;
 
 namespace UnityChess.Core.Test {
 	[TestFixture]
@@ -108,7 +109,7 @@ namespace UnityChess.Core.Test {
 			WhiteWhiteKingside,
 			KingWhiteKingside
 		}
-		
+
 		private static Dictionary<Side, GameConditions> dummyConditionsBySide = new Dictionary<Side, GameConditions> {
 			[Side.White] = new GameConditions(
 				sideToMove: Side.White,
@@ -131,7 +132,7 @@ namespace UnityChess.Core.Test {
 				turnNumber: 1
 			)
 		};
-		
+
 		private static class RulesTestData {
 			private static Board StartingPositionNone(Side side) {
 				return new Board(Board.StartingPositionPieces);

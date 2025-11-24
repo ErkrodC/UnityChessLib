@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityChess.Util;
 
 namespace UnityChess.Core {
 	/// <summary>Contains methods for checking legality of moves and board positions.</summary>
@@ -21,10 +22,10 @@ namespace UnityChess.Core {
 				|| board[move.End] is King
 			    || board.IsOccupiedBySideAt(move.End, movedPieceSide)
 			) { return false; }
-			
+
 			Board resultingBoard = new Board(board);
 			resultingBoard.MovePiece(new Movement(move.Start, move.End));
-			
+
 			return !IsPlayerInCheck(resultingBoard, movedPieceSide);
 		}
 
@@ -51,7 +52,7 @@ namespace UnityChess.Core {
 							               && endSquare.Rank == squareInQuestion.Rank + friendlyForward:
 								return true;
 						}
-						
+
 						// stop checking this diagonal in the case of enemy knight
 						break;
 					}
@@ -59,10 +60,10 @@ namespace UnityChess.Core {
 					endSquare += offset;
 				}
 			}
-			
+
 			foreach (Square offset in SquareUtil.KnightOffsets) {
 				Square endSquare = squareInQuestion + offset;
-				
+
 				if (endSquare.IsValid()
 				    && board[endSquare] is Knight knight
 				    && knight.Owner == enemySide

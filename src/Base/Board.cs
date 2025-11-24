@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityChess.Util;
 
 namespace UnityChess.Core {
 	/// <summary>An 8x8 matrix representation of a chessboard.</summary>
@@ -30,7 +31,7 @@ namespace UnityChess.Core {
 		/// <summary>Creates a Board given the passed square-piece pairs.</summary>
 		public Board(params (Square, Piece)[] squarePiecePairs) {
 			boardMatrix = new Piece[8, 8];
-			
+
 			foreach ((Square position, Piece piece) in squarePiecePairs) {
 				this[position] = piece;
 			}
@@ -73,7 +74,7 @@ namespace UnityChess.Core {
 			(new Square("f1"), new Bishop(Side.White)),
 			(new Square("g1"), new Knight(Side.White)),
 			(new Square("h1"), new Rook(Side.White)),
-			
+
 			(new Square("a2"), new Pawn(Side.White)),
 			(new Square("b2"), new Pawn(Side.White)),
 			(new Square("c2"), new Pawn(Side.White)),
@@ -82,7 +83,7 @@ namespace UnityChess.Core {
 			(new Square("f2"), new Pawn(Side.White)),
 			(new Square("g2"), new Pawn(Side.White)),
 			(new Square("h2"), new Pawn(Side.White)),
-			
+
 			(new Square("a8"), new Rook(Side.Black)),
 			(new Square("b8"), new Knight(Side.Black)),
 			(new Square("c8"), new Bishop(Side.Black)),
@@ -91,7 +92,7 @@ namespace UnityChess.Core {
 			(new Square("f8"), new Bishop(Side.Black)),
 			(new Square("g8"), new Knight(Side.Black)),
 			(new Square("h8"), new Rook(Side.Black)),
-			
+
 			(new Square("a7"), new Pawn(Side.Black)),
 			(new Square("b7"), new Pawn(Side.Black)),
 			(new Square("c7"), new Pawn(Side.Black)),
@@ -116,7 +117,7 @@ namespace UnityChess.Core {
 
 			(move as SpecialMove)?.HandleAssociatedPiece(this);
 		}
-		
+
 		internal bool IsOccupiedAt(Square position) => this[position] != null;
 
 		internal bool IsOccupiedBySideAt(Square position, Side side) => this[position] is Piece piece && piece.Owner == side;
@@ -137,7 +138,7 @@ namespace UnityChess.Core {
 
 		public string ToTextArt() {
 			string result = string.Empty;
-			
+
 			for (int rank = 8; rank >= 1; --rank) {
 				for (int file = 1; file <= 8; ++file) {
 					Piece piece = this[file, rank];
@@ -149,10 +150,10 @@ namespace UnityChess.Core {
 
 				result += "\n";
 			}
-			
+
 			result += "a b c d e f g h";
 
 			return result;
-		} 
+		}
 	}
 }

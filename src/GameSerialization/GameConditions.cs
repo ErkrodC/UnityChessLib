@@ -1,4 +1,6 @@
-﻿namespace UnityChess.Core {
+﻿using UnityChess.Util;
+
+namespace UnityChess.Core {
 	/// Non-board, non-move-record game state
 	public struct GameConditions {
 		public static GameConditions NormalStartingConditions = new GameConditions(
@@ -11,7 +13,7 @@
 			halfMoveClock: 0,
 			turnNumber: 1
 		);
-		
+
 		public readonly Side SideToMove;
 		public readonly bool WhiteCanCastleKingside;
 		public readonly bool WhiteCanCastleQueenside;
@@ -20,7 +22,7 @@
 		public readonly Square EnPassantSquare;
 		public readonly int HalfMoveClock;
 		public readonly int TurnNumber;
-	
+
 		public GameConditions(
 			Side sideToMove,
 			bool whiteCanCastleKingside,
@@ -51,7 +53,7 @@
 				Piece: Rook { Owner: Side.White },
 				Move: { Start: { File: 8, Rank: 1 } }
 			};
-			
+
 			bool blackKingMoved = lastHalfMove.Piece is King { Owner: Side.Black };
 			bool blackQueensideRookMoved = lastHalfMove is {
 				Piece: Rook { Owner: Side.Black },
@@ -79,7 +81,7 @@
 				? 0
 				: endingHalfMoveClock + 1;
 		}
-		
+
 		private static Square GetNextEnPassantSquare(HalfMove lastHalfMove) {
 			Side lastTurnPieceColor = lastHalfMove.Piece.Owner;
 			int pawnStartingRank = lastTurnPieceColor == Side.White ? 2 : 7;

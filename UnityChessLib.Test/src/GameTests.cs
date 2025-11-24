@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Moq;
+using UnityChess.Util;
 
 namespace UnityChess.Core.Test {
 	[TestFixture]
@@ -27,11 +28,11 @@ namespace UnityChess.Core.Test {
 		}
 
 		private static Board CreateBoard(int numberOfPieces, Mock<Piece> mockPiece) {
-			Board result = new Board(); 
-			
+			Board result = new Board();
+
 			for (int i = 0; i < numberOfPieces; i++) {
 				int file = i / 8 + 1;
-				int rank = i % 8 + 1; 
+				int rank = i % 8 + 1;
 				result[file, rank] = mockPiece.Object;
 			}
 

@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using UnityChess.Util;
 
 namespace UnityChess.Core.Test {
 	[TestFixture]
@@ -24,7 +25,7 @@ namespace UnityChess.Core.Test {
 		public void MovePiece_NormalMove_PieceIsMoved(int expectedFile, int expectedRank) {
 			Square expectedPosition = new Square(expectedFile, expectedRank);
 			Movement move = new Movement(pawnStartSquare, expectedPosition);
-			
+
 			board.MovePiece(move);
 
 			Assert.AreEqual(pawn, board[expectedPosition]);
@@ -54,7 +55,7 @@ namespace UnityChess.Core.Test {
 			board = new Board((kingStartSquare, king));
 			Movement move0 = new Movement(kingStartSquare, kingEndSquare0);
 			Movement move1 = new Movement(kingEndSquare0, kingEndSquare1);
-			
+
 			board.MovePiece(move0);
 			board.GetKingSquare(player);
 			board.MovePiece(move1);

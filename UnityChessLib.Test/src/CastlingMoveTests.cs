@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using UnityChess.Util;
 
 namespace UnityChess.Core.Test {
 	[TestFixture]

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityChess.Util;
 
 namespace UnityChess.Core {
 	/// <summary>Representation of a standard chess game including a history of moves made.</summary>
