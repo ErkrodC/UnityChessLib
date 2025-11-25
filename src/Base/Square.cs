@@ -28,8 +28,8 @@ namespace UnityChess.Core {
 		}
 
 		internal readonly bool IsValid() {
-			return File is >= 1 and <= 8
-			       && Rank is >= 1 and <= 8;
+			return File is >= 0 and <= 7
+			       && Rank is >= 0 and <= 7;
 		}
 
 		public static bool operator ==(Square lhs, Square rhs) => lhs.File == rhs.File && lhs.Rank == rhs.Rank;

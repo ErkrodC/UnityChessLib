@@ -42,7 +42,7 @@ namespace UnityChess.Core {
 			for (int i = 0; i < rankStrings.Length; ++i) {
 				string rankString = rankStrings[i];
 
-				int file = 1;
+				int file = 0;
 				foreach (char character in rankString) {
 					if (int.TryParse(character.ToString(), out int emptySpaces)) {
 						file += emptySpaces;
@@ -50,7 +50,7 @@ namespace UnityChess.Core {
 					}
 
 					result.Add((
-						new Square(file++, 8 - i),
+						new Square(file++, 7 - i),
 						GetPieceFromFENSymbol(
 							character.ToString()
 						)
@@ -63,16 +63,16 @@ namespace UnityChess.Core {
 
 		private static string CalculateBoardString(Board currentBoard) {
 			string[] rankStrings = new string[8];
-			for (int rank = 1; rank <= 8; rank++) {
+			for (int rank = 0; rank < 8; rank++) {
 				int emptySquareCount = 0;
-				int rankStringsIndex = 7 - (rank - 1);
+				int rankStringsIndex = 7 - rank;
 				rankStrings[rankStringsIndex] = "";
-				for (int file = 1; file <= 8; file++) {
+				for (int file = 0; file < 8; file++) {
 					Piece piece = currentBoard[file, rank];
 					if (piece == null) {
 						emptySquareCount++;
 
-						if (file == 8) { // reached end of rank, append empty square count to rankString
+						if (file == 7) { // reached end of rank, append empty square count to rankString
 							rankStrings[rankStringsIndex] += emptySquareCount;
 							emptySquareCount = 0;
 						}

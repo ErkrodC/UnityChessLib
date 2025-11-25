@@ -97,7 +97,7 @@ namespace UnityChess.Core {
 			Square enPassantEligibleSquare,
 			ref Dictionary<(Square, Square), Movement> movesByStartEndSquares
 		) {
-			int enPassantCaptureRank = Owner == Side.White ? 5 : 4;
+			int enPassantCaptureRank = Owner == Side.White ? 4 : 3;
 			if (position.Rank != enPassantCaptureRank) {
 				return;
 			}

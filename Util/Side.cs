@@ -22,14 +22,14 @@ namespace UnityChess.Util {
 		};
 
 		public static int CastlingRank(this Side side) => side switch {
-			Side.White => 1,
-			Side.Black => 8,
+			Side.White => 0,
+			Side.Black => 7,
 			_ => throw new InvalidEnumArgumentException(nameof(side), (int) side, typeof(Side))
 		};
 
 		public static int PawnRank(this Side side) => side switch {
-			Side.White => 2,
-			Side.Black => 7,
+			Side.White => 1,
+			Side.Black => 6,
 			_ => throw new InvalidEnumArgumentException(nameof(side), (int) side, typeof(Side))
 		};
 	}

@@ -13,12 +13,12 @@ namespace UnityChess.Core {
 
 		public Piece this[Square position] {
 			get {
-				if (position.IsValid()) return boardMatrix[position.File - 1, position.Rank - 1];
+				if (position.IsValid()) return boardMatrix[position.File, position.Rank];
 				throw new ArgumentOutOfRangeException($"Position was out of range: {position}");
 			}
 
 			set {
-				if (position.IsValid()) boardMatrix[position.File - 1, position.Rank - 1] = value;
+				if (position.IsValid()) boardMatrix[position.File, position.Rank] = value;
 				else throw new ArgumentOutOfRangeException($"Position was out of range: {position}");
 			}
 		}
@@ -44,8 +44,8 @@ namespace UnityChess.Core {
 			// this may be a memory hog since each Board has a list of Piece's, and each piece has a list of Movement's
 			// avg number turns/Board's per game should be around ~80. usual max number of pieces per board is 32
 			boardMatrix = new Piece[8, 8];
-			for (int file = 1; file <= 8; file++) {
-				for (int rank = 1; rank <= 8; rank++) {
+			for (int file = 0; file < 8; file++) {
+				for (int rank = 0; rank < 8; rank++) {
 					Piece pieceToCopy = board[file, rank];
 					if (pieceToCopy == null) { continue; }
 
@@ -55,8 +55,8 @@ namespace UnityChess.Core {
 		}
 
 		public void ClearBoard() {
-			for (int file = 1; file <= 8; file++) {
-				for (int rank = 1; rank <= 8; rank++) {
+			for (int file = 0; file < 8; file++) {
+				for (int rank = 0; rank < 8; rank++) {
 					this[file, rank] = null;
 				}
 			}
@@ -124,8 +124,8 @@ namespace UnityChess.Core {
 
 		public Square GetKingSquare(Side player) {
 			if (currentKingSquareBySide[player] == null) {
-				for (int file = 1; file <= 8; file++) {
-					for (int rank = 1; rank <= 8; rank++) {
+				for (int file = 0; file < 8; file++) {
+					for (int rank = 0; rank < 8; rank++) {
 						if (this[file, rank] is King king) {
 							currentKingSquareBySide[king.Owner] = new Square(file, rank);
 						}
@@ -139,13 +139,13 @@ namespace UnityChess.Core {
 		public string ToTextArt() {
 			string result = string.Empty;
 
-			for (int rank = 8; rank >= 1; --rank) {
-				for (int file = 1; file <= 8; ++file) {
+			for (int rank = 7; rank >= 0; --rank) {
+				for (int file = 0; file < 8; ++file) {
 					Piece piece = this[file, rank];
 					result += piece.ToTextArt();
-					result += file != 8
+					result += file != 7
 						? "|"
-						: $"\t {rank}";
+						: $"\t {rank + 1}";
 				}
 
 				result += "\n";

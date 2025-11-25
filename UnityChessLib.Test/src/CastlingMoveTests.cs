@@ -12,13 +12,13 @@ namespace UnityChess.Core.Test {
 		}
 
 		[Test]
-		[TestCase(6, 8)] //Kingside castle
-		[TestCase(4, 1)] //Queenside castle
+		[TestCase(5, 7)] //Kingside castle
+		[TestCase(3, 0)] //Queenside castle
 		public void HandleAssociatedPiece_CastlingMove_RookMovedAsExpected(int expected, int rookStartingFile) {
-			Square rookStartSquare = new Square(rookStartingFile, 1);
+			Square rookStartSquare = new Square(rookStartingFile, 0);
 			Rook rook = new Rook(Side.White);
 			board[rookStartSquare] = rook;
-			CastlingMove castlingMove = new CastlingMove(new Square(5, 1), new Square(7, 1), rookStartSquare);
+			CastlingMove castlingMove = new CastlingMove(new Square(4, 0), new Square(6, 0), rookStartSquare);
 
 			castlingMove.HandleAssociatedPiece(board);
 
