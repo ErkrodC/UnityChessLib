@@ -36,7 +36,7 @@ namespace UnityChess.Core {
 		// TODO handle ambiguous piece moves.
 		public string ToAlgebraicNotation() {
 			string pieceSymbol = Piece is Pawn && CapturedPiece
-				? SquareUtil.FileIntToCharMap[Move.Start.File]
+				? SquareUtil.FileIndexToCharMap[Move.Start.File]
 				: pieceTypeToANSymbolMap[Piece.GetType()];
 
 			string capture = CapturedPiece ? "x" : string.Empty;

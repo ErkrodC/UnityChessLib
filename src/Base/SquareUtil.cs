@@ -2,7 +2,7 @@
 
 namespace UnityChess.Core {
 	public static class SquareUtil {
-		public static readonly Dictionary<string, int> FileCharToIntMap = new() {
+		public static readonly Dictionary<string, int> FileCharToIndexMap = new() {
 			{"a", 0},
 			{"b", 1},
 			{"c", 2},
@@ -13,7 +13,7 @@ namespace UnityChess.Core {
 			{"h", 7}
 		};
 
-		public static readonly Dictionary<int, string> FileIntToCharMap = new() {
+		public static readonly Dictionary<int, string> FileIndexToCharMap = new() {
 			{0, "a"},
 			{1, "b"},
 			{2, "c"},
@@ -64,18 +64,20 @@ namespace UnityChess.Core {
 
 		public static string SquareToString(Square square) => SquareToString(square.File, square.Rank);
 		public static string SquareToString(int file, int rank) {
-			if (FileIntToCharMap.TryGetValue(file, out string fileChar)) {
-				return $"{fileChar}{rank}";
+			if (FileIndexToCharMap.TryGetValue(file, out string fileChar)) {
+				return $"{fileChar}{rank + 1}";
 			}
 
 			return "Invalid";
 		}
 
 		public static Square StringToSquare(string squareText) {
-			return new Square(
-				FileCharToIntMap[squareText[0].ToString()],
-				int.Parse(squareText[1].ToString())
-			);
+			char fileChar = squareText[0];
+			char rankChar = squareText[1];
+			int file = FileCharToIndexMap[fileChar.ToString()];
+			int rank = int.Parse(rankChar.ToString()) - 1;
+
+			return new Square(file, rank);
 		}
 	}
 }
