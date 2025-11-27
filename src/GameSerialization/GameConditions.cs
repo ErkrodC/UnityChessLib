@@ -83,14 +83,16 @@ namespace UnityChess.Core {
 		}
 
 		private static Square GetNextEnPassantSquare(HalfMove lastHalfMove) {
-			Side lastTurnPieceColor = lastHalfMove.Piece.Owner;
-			int pawnStartingRank = lastTurnPieceColor == Side.White ? 2 : 7;
-			int pawnEndingRank = lastTurnPieceColor == Side.White ? 4 : 5;
+			Side lastTurnSide = lastHalfMove.Piece.Owner;
+			Side currentSide = lastTurnSide.Complement();
+			int vantageRank = currentSide.EnPassantVantageRank();
 
 			Square enPassantSquare = Square.Invalid;
-			if (lastHalfMove.Piece is Pawn && lastHalfMove.Move.Start.Rank == pawnStartingRank && lastHalfMove.Move.End.Rank == pawnEndingRank) {
-				int rankOffset = lastTurnPieceColor == Side.White ? -1 : 1;
-				enPassantSquare = new Square(lastHalfMove.Move.End, 0, rankOffset);
+			if (lastHalfMove.Piece is Pawn
+			    && lastHalfMove.Move.Start.Rank == lastTurnSide.PawnRank()
+			    && lastHalfMove.Move.End.Rank == vantageRank
+			) {
+				enPassantSquare = new Square(lastHalfMove.Move.End, 0, currentSide.ForwardDirection());
 			}
 
 			return enPassantSquare;

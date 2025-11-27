@@ -34,8 +34,8 @@ namespace UnityChess.Core {
 			ref Dictionary<(Square, Square), Movement> movesByStartEndSquares
 		) {
 			int forwardDirection = Owner.ForwardDirection();
-			Square endSquare = new Square(position, 0, forwardDirection);
-			Movement testMove = new Movement(position, endSquare);
+			Square endSquare = new(position, 0, forwardDirection);
+			Movement testMove = new(position, endSquare);
 
 			if (!board.IsOccupiedAt(endSquare)
 			) {
@@ -97,12 +97,11 @@ namespace UnityChess.Core {
 			Square enPassantEligibleSquare,
 			ref Dictionary<(Square, Square), Movement> movesByStartEndSquares
 		) {
-			int enPassantCaptureRank = Owner == Side.White ? 4 : 3;
-			if (position.Rank != enPassantCaptureRank) {
+			if (position.Rank != Owner.EnPassantVantageRank()) {
 				return;
 			}
 
-			Square capturedPawnSquare = enPassantEligibleSquare + new Square(0, -Owner.ForwardDirection());
+			Square capturedPawnSquare = enPassantEligibleSquare + new Square(0, Owner.BackwardDirection());
 			if (capturedPawnSquare.IsValid()
 			    && board[capturedPawnSquare] is Pawn capturedPawn
 			    && capturedPawn.Owner != Owner

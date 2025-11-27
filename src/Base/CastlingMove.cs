@@ -29,8 +29,8 @@ namespace UnityChess.Core {
 
 		public Square GetRookEndSquare() {
 			int rookFileOffset = RookSquare.File switch {
-				1 => 3,
-				8 => -2,
+				0 => 3,
+				7 => -2,
 				_ => throw new ArgumentException(
 					$"{nameof(RookSquare)}.{nameof(RookSquare.File)} is invalid"
 				)
